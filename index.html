@@ -132,15 +132,36 @@
           table.deleteRow(row);
           console.log("Deleting row: " + row);
         });
+
+        socket.on('play row', function(row){
+          var table = document.getElementById("myTableData");
+          var x = document.getElementById("myTableData").rows[row].cells;
+          var newLink = x[3].innerHTML;
+          if(newLink != ""){
+            var inputVideo = newLink + "?autoplay=1";
+            document.getElementById("ytvid").src = inputVideo;    //Replace video
+            console.log("Successfully inputted!");
+          }else{
+            console.log("Link is empty");
+          }
+        });
       }); //end of $function
 
-      //Need to update this
+      //Try to modularize the files by adding main.js but currently page refreshes upon finding main.js
       function deleteRow(obj) {
           //Test how sockets work
           var socket = io();
           var index = obj.parentNode.parentNode.rowIndex;
           socket.emit('delete row', index);
           //socket.emit('delete row', $('#v').val()); //I am able to do this <---
+      }
+      function playRow(obj){
+        var socket = io();
+        var index = obj.parentNode.parentNode.rowIndex;
+        socket.emit('play row', index);
+        //Get the link from the current row and replace ytvid id with this row's id
+
+
       }
     </script>
 

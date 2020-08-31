@@ -2,9 +2,12 @@ const express = require('express')
 const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
-const path = require('path')
+const path = require('path');
 
-app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static('public'));
+
+//Below is working (original , new is above )
+//app.use(express.static(path.join(__dirname, 'public')))
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -27,7 +30,10 @@ io.on('connection', (socket) => {
     console.log("Delete row: " + row); //Should output to terminal
     io.emit('delete row', row);
   });
-
+  socket.on('play row', (row) => {
+    console.log("Play row: " + row); //Should output to terminal
+    io.emit('play row', row);
+  });
 
 });
 
