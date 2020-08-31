@@ -16,12 +16,26 @@
   </head>
   <body>
     <ul id="messages"></ul>
+    <div class = "flex-container">
+        <div>
+          <iframe title="YouTube video player" id ="ytvid" class="youtube-player" type="text/html" width="720" height="480"
+           src="https://www.youtube.com/embed/M68OwnWhEqY?autoplay=1&loop=1"
+          frameborder="0" allow="autoplay"allowFullScreen></iframe>
+          <input id = "vidDisplay" type = "button" value="Hide" onclick="videoDisplay()"/>
+        </div>
 
-    <div>
-      <iframe title="YouTube video player" id ="ytvid" class="youtube-player" type="text/html" width="720" height="480"
-       src="https://www.youtube.com/embed/M68OwnWhEqY?autoplay=1&loop=1"
-      frameborder="0" allow="autoplay"allowFullScreen></iframe>
-      <input id = "vidDisplay" type = "button" value="Hide" onclick="videoDisplay()"/>
+        <div>
+          <table id="myTableData"  border="1" cellpadding="2">
+              <tr>
+                  <td>&nbsp;</td>
+                  <td><b>User</b></td>
+                  <td><b>Song</b></td>
+                  <td><b>Link</b></td>
+                  <td><b>Play </b></td>
+                  <td><b>Delete Song</b></td>
+              </tr>
+          </table>
+        </div>
     </div>
 
     <form action="">
@@ -42,8 +56,10 @@
         $('form').submit(function(e){
           e.preventDefault(); // prevents page reloading
 
-          if($('#v').val() !== ''){
+          if($('#v').val() !== ''){   //If valid input
             socket.emit('video link', $('#v').val());
+          }else{
+            alert("Empty video!")
           }
           // if($('#m').val() == ''){  //to get textfield value "$('#id').val()"
           //   alert("empty message");
@@ -67,15 +83,48 @@
         //   return false;
         // });
 
+        //Add more client side sockets here
+        var rowNum = 1;
         socket.on('video link', (video) => {
           console.log(video); //Just pass the object to view it
           //alert(text(video));
-          document.getElementById("ytvid").src = video + "?autoplay=1";
+          document.getElementById("ytvid").src = video + "?autoplay=1";   //Rep. vid with input
+
+          //Append to table
+          var table = document.getElementById("myTableData");
+
+          var link = video;
+          if(link.length > 50){
+            alert("Foh nga");
+            return; //use this in real code -- leave along for testing purposes
+          }
+          var user = 'Update later';
+          var song = "Update later";
+
+          //Buttons
+          var playAll = '<input type="button" value = "Play" onClick="Javacsript:playRow(this)">';  //Change to button
+          var deleteButton = '<input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)">';
+
+          //Buttons need to retrieve data and (update database)
+          var rowCount = table.rows.length;
+          var row = table.insertRow(rowCount);
+
+          let tableHeader2 = [rowNum,user, song, link, playAll, deleteButton]
+
+          var i;
+          for(i = 0; i < tableHeader2.length; i++){
+              row.insertCell(i).innerHTML = tableHeader2[i];
+          }
+          rowNum++;
+          document.getElementById("v").value = "";
+          document.getElementById("v").focus();
         });
 
         socket.on('chat message', function(msg){
           $('#messages').append($('<li>').text(msg));
         });
+
+
       });
     </script>
 
