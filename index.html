@@ -133,6 +133,17 @@
             console.log("Link is empty");
           }
         });
+
+        socket.on('hide video', function(){
+          var x = document.getElementById("ytvid");
+          if (x.style.display === "none") {
+            x.style.display = "block";
+            document.getElementById("vidDisplay").value = "Hide";
+          } else {
+            x.style.display = "none";
+            document.getElementById("vidDisplay").value = "Show";
+          }
+        });
       }); //end of $function
 
       //Try to modularize the files by adding main.js but currently page refreshes upon finding main.js
@@ -150,10 +161,9 @@
         socket.emit('play row', index);
       }
 
-      function parseString(obj){
-        //First take the string
-        var n = obj.indexOf("=");
-        console.log(n);
+      function videoDisplay(){
+        var socket = io();
+        socket.emit('hide video');
       }
 
       //TO DOOOOOOO

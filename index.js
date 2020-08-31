@@ -34,6 +34,9 @@ io.on('connection', (socket) => {
     console.log("Play row: " + row); //Should output to terminal
     io.emit('play row', row);
   });
+  socket.on('hide video',() =>{
+    io.emit('hide video');
+  });
 
 });
 
