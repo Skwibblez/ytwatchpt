@@ -45,7 +45,19 @@
           e.preventDefault(); // prevents page reloading
 
           if($('#v').val() !== ''){   //If valid input
-            socket.emit('video link', $('#v').val());
+            //socket.emit('video link', $('#v').val());   //Sends object to server
+            //String parser here -- should use YT API later
+            var n = $('#v').val().indexOf("=");
+            var length = $('#v').val().length;
+            if(n !== -1){   //Checking for specific ID
+              socket.emit('video link', $('#v').val().substring(n+1, length));
+            }else{
+              alert("Invalid youtube link");
+            }
+
+            console.log("Length: " + length);
+            console.log("New string: " + $('#v').val().substring(n+1, length));
+            console.log("Index: " + n);
           }else{
             alert("Empty video!")
           }
@@ -66,13 +78,15 @@
         socket.on('video link', (video) => {
           console.log(video); //Just pass the object to view it
           //alert(text(video));
-          document.getElementById("ytvid").src = video + "?autoplay=1&loop=1";   //Rep. vid with input
+          //var link = "https://www.youtube.com/watch?v=" + video;
 
+          document.getElementById("ytvid").src = "https://www.youtube.com/embed/" + video + "?autoplay=1&loop=1";   //Rep. vid with input
+          var link = "https://www.youtube.com/embed/" + video;
           //Append to table
           var table = document.getElementById("myTableData");
 
-          var link = video;
-          if(link.length > 50){
+
+          if(link.length > 60){
             alert("Foh nga");
             return; //use this in real code -- leave along for testing purposes
           }
@@ -134,6 +148,12 @@
         var socket = io();
         var index = obj.parentNode.parentNode.rowIndex;
         socket.emit('play row', index);
+      }
+
+      function parseString(obj){
+        //First take the string
+        var n = obj.indexOf("=");
+        console.log(n);
       }
 
       //TO DOOOOOOO
