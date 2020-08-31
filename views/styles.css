@@ -1,0 +1,59 @@
+#picture{
+  width: 400px;
+  height: 300px;
+  margin-bottom:5px;
+}
+
+#picDiv{
+  /*float:right;*/
+}
+
+.flex-container{
+  display: flex;
+}
+
+#ytvid{
+  /* Centers*/
+  /*display: block;
+  margin: 0 auto;
+  */
+  float: "left";
+  width: 720px;
+  height: 480px;
+  margin-bottom:5px;
+}
+
+#myTableData{
+  float: "left";
+}
+
+#videoForm{
+  margin-buttom: 10px;
+}
+#assortedButtons{
+  margin-bottom: 5px;
+}
+#anime{
+  margin-bottom: 15px;
+}
+#nVid{
+  margin-bottom:5px;
+}
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+body {
+  background-image: url('https://hdwallpapers.cat/wallpaper/grisaia-no-kajitsu-suou-amane-girl-video-cg-8hWG.jpg');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
