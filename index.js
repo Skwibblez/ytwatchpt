@@ -26,7 +26,7 @@ io.on('connection', (socket) => {
 // });
 
 
-var PORT = 2222 ||process.env.PORT
+var PORT = process.env.PORT || 2222;
 http.listen(PORT, () => {
   console.log('listening on *:2222');
 });
