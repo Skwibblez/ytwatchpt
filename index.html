@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
-    <style>
+    <!-- <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
@@ -11,25 +11,67 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
-    </style>
+    </style> -->
   </head>
   <body>
     <ul id="messages"></ul>
+
+    <div>
+      <iframe title="YouTube video player" id ="ytvid" class="youtube-player" type="text/html" width="720" height="480"
+       src="https://www.youtube.com/embed/M68OwnWhEqY?autoplay=1&loop=1"
+      frameborder="0" allow="autoplay"allowFullScreen></iframe>
+      <input id = "vidDisplay" type = "button" value="Hide" onclick="videoDisplay()"/>
+    </div>
+
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
 
+    <form action="">
+      <input id="v" autocomplete="off" /><button>Video</button>
+    </form>
+
     <script src = "/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <!-- the magic is HERE -->
     <script>
       $(function () {
         var socket = io();
+
         $('form').submit(function(e){
           e.preventDefault(); // prevents page reloading
-          socket.emit('chat message', $('#m').val());
-          $('#m').val('');
+
+          if($('#v').val() !== ''){
+            socket.emit('video link', $('#v').val());
+          }
+          // if($('#m').val() == ''){  //to get textfield value "$('#id').val()"
+          //   alert("empty message");
+          // }else if($('#v').val() !== ''){
+          //   socket.emit('video link', $('#v').val());
+          // }else{
+          //   console.log($('#m').val())  //Should print to browser because client side
+          //   socket.emit('chat message', $('#m').val()); //take out of if, if this doesnt work
+          // }
+
+          // socket.emit('chat message', $('#m').val());
+          $('#m').val('');  //Resets the textfield
+          $('#v').val('');
           return false;
         });
+
+        // $('form').submit(function(e){
+        //   e.preventDefault(); // prevents page reloading
+        //   socket.emit('chat message', $('#m').val());
+        //   $('#m').val('');  //Resets the textfield
+        //   return false;
+        // });
+
+        socket.on('video link', (video) => {
+          console.log(video); //Just pass the object to view it
+          //alert(text(video));
+          document.getElementById("ytvid").src = video + "?autoplay=1";
+        });
+
         socket.on('chat message', function(msg){
           $('#messages').append($('<li>').text(msg));
         });
