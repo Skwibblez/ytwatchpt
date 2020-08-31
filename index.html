@@ -88,7 +88,7 @@
         socket.on('video link', (video) => {
           console.log(video); //Just pass the object to view it
           //alert(text(video));
-          document.getElementById("ytvid").src = video + "?autoplay=1";   //Rep. vid with input
+          document.getElementById("ytvid").src = video + "?autoplay=1&loop=1";   //Rep. vid with input
 
           //Append to table
           var table = document.getElementById("myTableData");
@@ -118,14 +118,20 @@
           rowNum++;
           document.getElementById("v").value = "";
           document.getElementById("v").focus();
+
         });
 
         socket.on('chat message', function(msg){
           $('#messages').append($('<li>').text(msg));
         });
+      }); //end of $function
 
-
-      });
+      function deleteRow(obj) {
+          var socket = io();
+          var index = obj.parentNode.parentNode.rowIndex;
+          var table = document.getElementById("myTableData");
+          table.deleteRow(index);
+      }
     </script>
 
 
