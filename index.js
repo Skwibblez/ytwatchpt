@@ -23,6 +23,12 @@ io.on('connection', (socket) => {
     io.emit('video link', video);
   });
 
+  socket.on('delete row', (row) => {
+    console.log("Delete row: " + row); //Should output to terminal
+    io.emit('delete row', row);
+  });
+
+
 });
 
 // io.on('connection', (socket) => {

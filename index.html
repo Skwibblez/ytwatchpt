@@ -124,13 +124,23 @@
         socket.on('chat message', function(msg){
           $('#messages').append($('<li>').text(msg));
         });
+
+        //Need to do something to delete row -- need to know how to pass around correct index/object to delete
+        socket.on('delete row', function(row){
+          // var index = row.parentNode.parentNode.rowIndex;   //Pass index for deletion
+          var table = document.getElementById("myTableData");
+          table.deleteRow(row);
+          console.log("Deleting row: " + row);
+        });
       }); //end of $function
 
+      //Need to update this
       function deleteRow(obj) {
+          //Test how sockets work
           var socket = io();
           var index = obj.parentNode.parentNode.rowIndex;
-          var table = document.getElementById("myTableData");
-          table.deleteRow(index);
+          socket.emit('delete row', index);
+          //socket.emit('delete row', $('#v').val()); //I am able to do this <---
       }
     </script>
 
