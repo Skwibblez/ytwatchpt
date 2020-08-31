@@ -16,10 +16,10 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   //Declare multiple sockets inside of here
 
-  socket.on('chat message', (msg) => {
-    console.log("Message: " + msg); //Should output to terminal
-    io.emit('chat message', msg);
-  });
+  // socket.on('chat message', (msg) => {
+  //   console.log("Message: " + msg); //Should output to terminal
+  //   io.emit('chat message', msg);
+  // });
 
   socket.on('video link', (video) => {
     console.log("Video Link: " + video); //Should output to terminal

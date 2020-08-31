@@ -2,17 +2,7 @@
 <html>
   <head>
     <link rel="stylesheet" href="styles.css">
-    <title>Socket.IO chat</title>
-    <!-- <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: 0.5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
-    </style> -->
+    <title>Amane a best</title>
   </head>
   <body>
     <ul id="messages"></ul>
@@ -21,7 +11,7 @@
           <iframe title="YouTube video player" id ="ytvid" class="youtube-player" type="text/html" width="720" height="480"
            src="https://www.youtube.com/embed/M68OwnWhEqY?autoplay=1&loop=1"
           frameborder="0" allow="autoplay"allowFullScreen></iframe>
-          <input id = "vidDisplay" type = "button" value="Hide" onclick="videoDisplay()"/>
+          <input id = "vidDisplay" type = "button" value="Hide Me >///<" onclick="videoDisplay()"/>
         </div>
 
         <div>
@@ -39,11 +29,10 @@
     </div>
 
     <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-
-    <form action="">
-      <input id="v" autocomplete="off" /><button>Video</button>
+      <tr>
+        <td>YouTube Link: </td>
+        <td><input id="v" autocomplete="off" /><button>Video</button></td>
+      </tr>
     </form>
 
     <script src = "/socket.io/socket.io.js"></script>
@@ -52,7 +41,6 @@
     <script>
       $(function () {
         var socket = io();
-
         $('form').submit(function(e){
           e.preventDefault(); // prevents page reloading
 
@@ -61,18 +49,8 @@
           }else{
             alert("Empty video!")
           }
-          // if($('#m').val() == ''){  //to get textfield value "$('#id').val()"
-          //   alert("empty message");
-          // }else if($('#v').val() !== ''){
-          //   socket.emit('video link', $('#v').val());
-          // }else{
-          //   console.log($('#m').val())  //Should print to browser because client side
-          //   socket.emit('chat message', $('#m').val()); //take out of if, if this doesnt work
-          // }
-
           // socket.emit('chat message', $('#m').val());
-          $('#m').val('');  //Resets the textfield
-          $('#v').val('');
+          $('#v').val('');  //Resets the textfield
           return false;
         });
 
@@ -83,7 +61,7 @@
         //   return false;
         // });
 
-        //Add more client side sockets here
+        //ADD CLIENT SOCKETS HERE
         var rowNum = 1;
         socket.on('video link', (video) => {
           console.log(video); //Just pass the object to view it
@@ -121,10 +99,6 @@
 
         });
 
-        socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
-        });
-
         //Need to do something to delete row -- need to know how to pass around correct index/object to delete
         socket.on('delete row', function(row){
           // var index = row.parentNode.parentNode.rowIndex;   //Pass index for deletion
@@ -155,14 +129,26 @@
           socket.emit('delete row', index);
           //socket.emit('delete row', $('#v').val()); //I am able to do this <---
       }
+
       function playRow(obj){
         var socket = io();
         var index = obj.parentNode.parentNode.rowIndex;
         socket.emit('play row', index);
-        //Get the link from the current row and replace ytvid id with this row's id
-
-
       }
+
+      //TO DOOOOOOO
+      //Need to add enhanced search function -- may need to use YTAPI
+      //Need to add seeking as well as play/pause on video --
+      //not easy.. need to make own video player
+      //Can probably change how video submission works
+      //-- call function that emits to socket and pass the link
+      //Need to be able to hide video
+      //Need to add chat functionality?
+      //Need to add login?
+      //Site: https://noob-chat-test.herokuapp.com/
+      //Will rename later
+
+      //good work! 30% progress now??
     </script>
 
 
