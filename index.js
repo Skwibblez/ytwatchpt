@@ -13,18 +13,26 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
+var numUsers = 0;
+
 io.on('connection', (socket) => {
+
   //Declare multiple sockets inside of here
 
-  // socket.on('chat message', (msg) => {
-  //   console.log("Message: " + msg); //Should output to terminal
-  //   io.emit('chat message', msg);
-  // });
+  //Count number of active users
+  numUsers = numUsers+1;
+  io.emit('count users', numUsers);
+  socket.on('disconnect', () =>{
+    console.log('user disconnected');
+    numUsers = numUsers -1;
+    io.emit('count users', numUsers);
+  });
 
   socket.on('video link', (video) => {
     console.log("Video Link: " + video); //Should output to terminal
     io.emit('video link', video);
   });
+
 
   socket.on('delete row', (row) => {
     console.log("Delete row: " + row); //Should output to terminal
@@ -39,6 +47,12 @@ io.on('connection', (socket) => {
   });
 
 });
+
+// socket.on('chat message', (msg) => {
+//   console.log("Message: " + msg); //Should output to terminal
+//   io.emit('chat message', msg);
+// });
+//'
 
 // io.on('connection', (socket) => {
 //   socket.on('chat message', (msg) => {

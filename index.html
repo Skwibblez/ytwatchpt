@@ -6,6 +6,7 @@
   </head>
   <body>
     <ul id="messages"></ul>
+    <p id="userCnt"> Connected users </p>
     <div class = "flex-container">
         <div>
           <iframe title="YouTube video player" id ="ytvid" class="youtube-player" type="text/html" width="720" height="480"
@@ -143,6 +144,12 @@
             x.style.display = "none";
             document.getElementById("vidDisplay").value = "Show";
           }
+        });
+
+        socket.on('count users', function(numUsers){
+          console.log('User connected' + numUsers);
+          document.getElementById("userCnt").innerHTML = "Connected Users: " + numUsers;
+          //alert(numUsers);
         });
       }); //end of $function
 
