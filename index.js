@@ -20,7 +20,8 @@ io.on('connection', (socket) => {
   //Declare multiple sockets inside of here
 
   //Count number of active users
-  numUsers = numUsers+1;
+  //Has bugs... figure out later
+  numUsers = numUsers + 1;
   io.emit('count users', numUsers);
   socket.on('disconnect', () =>{
     console.log('user disconnected');
@@ -32,7 +33,6 @@ io.on('connection', (socket) => {
     console.log("Video Link: " + video); //Should output to terminal
     io.emit('video link', video);
   });
-
 
   socket.on('delete row', (row) => {
     console.log("Delete row: " + row); //Should output to terminal
