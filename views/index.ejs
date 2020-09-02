@@ -26,12 +26,12 @@
             </tr>
             <% for(var i = 0; i < songs.length; i++) {%>
                 <tr>
-                    <td><b><%= songs[i].row_num %></b></td>
-                    <td><b><%= songs[i].user %></b></td>
-                    <td><b><%= songs[i].song_name %></b></td>
-                    <td><b><%= songs[i].link %> </b></td>
-                    <td><b><input type="button" value = "Play" onClick="Javacsript:playRow(this)"></b></td>
-                    <td><b><input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)"></b></td>
+                    <td><%= songs[i].row_num %></td>
+                    <td><%= songs[i].user %></td>
+                    <td><%= songs[i].song_name %></td>
+                    <td><%= songs[i].link %> </td>
+                    <td><input type="button" value = "Play" onClick="Javacsript:playRow(this)"></td>
+                    <td><input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)"></td>
                 </tr>
             <% } %>
           </table>
