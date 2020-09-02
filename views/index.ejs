@@ -26,10 +26,10 @@
             </tr>
             <% for(var i = 0; i < songs.length; i++) {%>
                 <tr>
-                    <td><%= songs[i].row_num %></td>
-                    <td><%= songs[i].user %></td>
-                    <td><%= songs[i].song_name %></td>
-                    <td><%= songs[i].link %> </td>
+                    <td><%=songs[i].row_num%></td>
+                    <td><%=songs[i].user %></td>
+                    <td><%=songs[i].song_name%></td>
+                    <td><%=songs[i].link%> </td>
                     <td><input type="button" value = "Play" onClick="Javacsript:playRow(this)"></td>
                     <td><input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)"></td>
                 </tr>
@@ -135,9 +135,11 @@
         socket.on('play row', function(row){
           var table = document.getElementById("myTableData");
           var x = document.getElementById("myTableData").rows[row].cells;
-          var newLink = x[3].innerHTML;
+          var newLink = x[3].innerHTML;     //Invisible space added at end for some reason
+
           if(newLink != ""){
-            var inputVideo = newLink + "?autoplay=1";
+            var inputVideo = newLink.substring(0,newLink.length-1) + "?autoplay=1";
+            console.log("InputVid: " + inputVideo);
             document.getElementById("ytvid").src = inputVideo;    //Replace video
             console.log("Successfully inputted!");
           }else{
