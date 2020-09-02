@@ -1,6 +1,8 @@
 <!doctype html>
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <html lang="en-US">
     <link rel="stylesheet" href="styles.css">
     <title>Amane a best</title>
   </head>
@@ -12,7 +14,7 @@
           <iframe title="YouTube video player" id ="ytvid" class="youtube-player" type="text/html" width="720" height="480"
            src="https://www.youtube.com/embed/M68OwnWhEqY?autoplay=1&loop=1"
           frameborder="0" allow="autoplay"allowFullScreen></iframe>
-          <input id = "vidDisplay" type = "button" value="Hide Me >///<" onclick="videoDisplay()"/>
+          <br><input id = "vidDisplay" type = "button" value="Hide >///<" onclick="videoDisplay()"/>
         </div>
         <div>
           <table id="myTableData"  border="1" cellpadding="2">
@@ -109,17 +111,17 @@
           var playAll = '<input type="button" value = "Play" onClick="Javacsript:playRow(this)">';  //Change to button
           var deleteButton = '<input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)">';
 
-          //Buttons need to retrieve data and (update database)
+          //Insert data into row into table
           var rowCount = table.rows.length;
           var row = table.insertRow(rowCount);
           let tableHeader2 = [rowNum,user, song, link, playAll, deleteButton]
-          var i;
 
-          for(i = 0; i < tableHeader2.length; i++){
+
+          for(var i = 0; i < tableHeader2.length; i++){
               row.insertCell(i).innerHTML = tableHeader2[i];
           }
           rowNum++;
-          document.getElementById("v").value = "";
+          document.getElementById("v").value = "";  //Reset textfield value
           document.getElementById("v").focus();
 
         });
@@ -136,8 +138,10 @@
           var table = document.getElementById("myTableData");
           var x = document.getElementById("myTableData").rows[row].cells;
           var newLink = x[3].innerHTML;     //Invisible space added at end for some reason
-
+          console.log("start"+newLink+"end")
+          console.log("Length: " + newLink.length)
           if(newLink != ""){
+            //Bad fix -- links from db have extra char but newly added songs dont
             var inputVideo = newLink.substring(0,newLink.length-1) + "?autoplay=1";
             console.log("InputVid: " + inputVideo);
             document.getElementById("ytvid").src = inputVideo;    //Replace video
@@ -151,10 +155,10 @@
           var x = document.getElementById("ytvid");
           if (x.style.display === "none") {
             x.style.display = "block";
-            document.getElementById("vidDisplay").value = "Hide";
+            document.getElementById("vidDisplay").value = "Hide >///<";
           } else {
             x.style.display = "none";
-            document.getElementById("vidDisplay").value = "Show";
+            document.getElementById("vidDisplay").value = "Show oWo";
           }
         });
 
@@ -188,14 +192,12 @@
       //not easy.. need to make own video player
       //Can probably change how video submission works
       //-- call function that emits to socket and pass the link
-      //Need to be able to hide video
       //Need to add chat functionality?
       //Need to add login?
       //Site: https://noob-chat-test.herokuapp.com/
       //Will rename later
 
       //REFER  to other ytproject for mongodb connection (problem was ip listing...fokme)
-      //Test if document.getElement.. works with ejs file
       //good work! 30% progress now??
     </script>
 
