@@ -53,7 +53,7 @@ MongoClient.connect(connectionString, (err, client) => {
       //Create obj to store in db
       //CHANGE link to redirect to main YT
       //Pass in length integrity here
-      var myobj = {row_num: video[0], user: video[1], song_name: video[2], link: "https://www.youtube.com/embed/" + video[3]}
+      var myobj = {row_num: video[0], user: video[1], song_name: video[2], link: "https://www.youtube.com/embed/" + video[3], integrity: 0}
       songsCollection.insertOne(myobj)
       io.emit('video link', video);
       console.log("DB video[] emitted");

@@ -23,6 +23,7 @@
                 <td><b>User</b></td>
                 <td><b>Song</b></td>
                 <td><b>Link</b></td>
+                <td><b>Int</b></td>
                 <td><b>Play </b></td>
                 <td><b>Delete Song</b></td>
             </tr>
@@ -32,13 +33,13 @@
                     <td><%=songs[i].user %></td>
                     <td><%=songs[i].song_name%></td>
                     <td><%=songs[i].link%> </td>
+                    <td>1</td>
                     <td><input type="button" value = "Play" onClick="Javacsript:playRow(this)"></td>
                     <td><input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)"></td>
                 </tr>
             <% } %>
           </table>
         </div>
-
     </div>
 
     <form action="">
@@ -55,7 +56,6 @@
       var rowNum = 1;
       var socket = io();
       $(function () {
-
         // var socket = io();
         $('form').submit(function(e){
           e.preventDefault(); // prevents page reloading
@@ -69,6 +69,7 @@
               //socket.emit('video link', $('#v').val().substring(n+1, length));
               var messageDetail = [rowNum,"user_", "song_name", $('#v').val().substring(n+1, length)];
               socket.emit('db vid link', messageDetail);
+              rowNum++;
             }else{
               alert("Invalid youtube link");
             }
@@ -106,7 +107,7 @@
 
           var user = 'Update later';
           var song = "Update later";
-
+          var integrity = 0;
           //Buttons
           var playAll = '<input type="button" value = "Play" onClick="Javacsript:playRow(this)">';  //Change to button
           var deleteButton = '<input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)">';
@@ -114,13 +115,12 @@
           //Insert data into row into table
           var rowCount = table.rows.length;
           var row = table.insertRow(rowCount);
-          let tableHeader2 = [rowNum,user, song, link, playAll, deleteButton]
-
+          let tableHeader2 = [rowNum,user, song, link,integrity, playAll, deleteButton]
 
           for(var i = 0; i < tableHeader2.length; i++){
               row.insertCell(i).innerHTML = tableHeader2[i];
           }
-          rowNum++;
+
           document.getElementById("v").value = "";  //Reset textfield value
           document.getElementById("v").focus();
 
@@ -139,10 +139,18 @@
           var x = document.getElementById("myTableData").rows[row].cells;
           var newLink = x[3].innerHTML;     //Invisible space added at end for some reason
           console.log("start"+newLink+"end")
+
           console.log("Length: " + newLink.length)
           if(newLink != ""){
             //Bad fix -- links from db have extra char but newly added songs dont
-            var inputVideo = newLink.substring(0,newLink.length-1) + "?autoplay=1";
+            if(x[4].innerHTML == 0){
+                var inputVideo = newLink + "?autoplay=1";
+                console.log("0 detected")
+            }else{
+              var inputVideo = newLink.substring(0,newLink.length-1) + "?autoplay=1";
+              console.log("1 not detected");
+            }
+
             console.log("InputVid: " + inputVideo);
             document.getElementById("ytvid").src = inputVideo;    //Replace video
             console.log("Successfully inputted!");
