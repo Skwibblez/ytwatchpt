@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css">
+    <title>Amane a best</title>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <p id="userCnt"> Connected users </p>
+    <div class = "flex-container">
+        <div>
+          <iframe title="YouTube video player" id ="ytvid" class="youtube-player" type="text/html" width="720" height="480"
+           src="https://www.youtube.com/embed/M68OwnWhEqY?autoplay=1&loop=1"
+          frameborder="0" allow="autoplay"allowFullScreen></iframe>
+          <input id = "vidDisplay" type = "button" value="Hide Me >///<" onclick="videoDisplay()"/>
+        </div>
+        <div>
+          <table id="myTableData"  border="1" cellpadding="2">
+            <tr>
+                <td>&nbsp;</td>
+                <td><b>User</b></td>
+                <td><b>Song</b></td>
+                <td><b>Link</b></td>
+                <td><b>Play </b></td>
+                <td><b>Delete Song</b></td>
+            </tr>
+            <% for(var i = 0; i < songs.length; i++) {%>
+                <tr>
+                    <td><b><%= songs[i].row_num %></b></td>
+                    <td><b><%= songs[i].user %></b></td>
+                    <td><b><%= songs[i].song_name %></b></td>
+                    <td><b><%= songs[i].link %> </b></td>
+                    <td><b><input type="button" value = "Play" onClick="Javacsript:playRow(this)"></b></td>
+                    <td><b><input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)"></b></td>
+                </tr>
+            <% } %>
+          </table>
+        </div>
+
+    </div>
+
+    <form action="">
+      <tr>
+        <td>YouTube Link: </td>
+        <td><input id="v" autocomplete="off" /><button>Video</button></td>
+      </tr>
+    </form>
+
+    <script src = "/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <!-- the magic is HERE -->
+    <script>
+      var rowNum = 1;
+      var socket = io();
+      $(function () {
+
+        // var socket = io();
+        $('form').submit(function(e){
+          e.preventDefault(); // prevents page reloading
+
+          if($('#v').val() !== ''){   //If valid input
+            //socket.emit('video link', $('#v').val());   //Sends object to server
+            //String parser here -- should use YT API later
+            var n = $('#v').val().indexOf("=");
+            var length = $('#v').val().length;
+            if(n !== -1){   //Checking for specific ID
+              //socket.emit('video link', $('#v').val().substring(n+1, length));
+              var messageDetail = [rowNum,"user_", "song_name", $('#v').val().substring(n+1, length)];
+              socket.emit('db vid link', messageDetail);
+            }else{
+              alert("Invalid youtube link");
+            }
+
+            console.log("Length: " + length);
+            console.log("New string: " + $('#v').val().substring(n+1, length));
+            console.log("Index: " + n);
+          }else{
+            alert("Empty video!")
+          }
+          // socket.emit('chat message', $('#m').val());
+          $('#v').val('');  //Resets the textfield
+          return false;
+        }); //form function
+
+        // $('form').submit(function(e){
+        //   e.preventDefault(); // prevents page reloading
+        //   socket.emit('chat message', $('#m').val());
+        //   $('#m').val('');  //Resets the textfield
+        //   return false;
+        // });
+
+        //ADD CLIENT SOCKETS HERE
+
+        socket.on('video link', (video) => {
+          console.log(video[2]); //Just pass the object to view it
+          //document.getElementById("ytvid").src = "https://www.youtube.com/embed/" + video + "?autoplay=1&loop=1";   //Rep. vid with input
+          var link = "https://www.youtube.com/embed/" + video[3];
+          var table = document.getElementById("myTableData");   //Append to table
+
+          if(link.length > 60){
+            alert("Foh nga");
+            return; //use this in real code -- leave along for testing purposes
+          }
+
+          var user = 'Update later';
+          var song = "Update later";
+
+          //Buttons
+          var playAll = '<input type="button" value = "Play" onClick="Javacsript:playRow(this)">';  //Change to button
+          var deleteButton = '<input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)">';
+
+          //Buttons need to retrieve data and (update database)
+          var rowCount = table.rows.length;
+          var row = table.insertRow(rowCount);
+          let tableHeader2 = [rowNum,user, song, link, playAll, deleteButton]
+          var i;
+
+          for(i = 0; i < tableHeader2.length; i++){
+              row.insertCell(i).innerHTML = tableHeader2[i];
+          }
+          rowNum++;
+          document.getElementById("v").value = "";
+          document.getElementById("v").focus();
+
+        });
+
+        //Need to do something to delete row -- need to know how to pass around correct index/object to delete
+        socket.on('delete row', function(row){
+          // var index = row.parentNode.parentNode.rowIndex;   //Pass index for deletion
+          var table = document.getElementById("myTableData");
+          table.deleteRow(row);
+          console.log("Deleting row: " + row);
+        });
+
+        socket.on('play row', function(row){
+          var table = document.getElementById("myTableData");
+          var x = document.getElementById("myTableData").rows[row].cells;
+          var newLink = x[3].innerHTML;
+          if(newLink != ""){
+            var inputVideo = newLink + "?autoplay=1";
+            document.getElementById("ytvid").src = inputVideo;    //Replace video
+            console.log("Successfully inputted!");
+          }else{
+            console.log("Link is empty");
+          }
+        });
+
+        socket.on('hide video', function(){
+          var x = document.getElementById("ytvid");
+          if (x.style.display === "none") {
+            x.style.display = "block";
+            document.getElementById("vidDisplay").value = "Hide";
+          } else {
+            x.style.display = "none";
+            document.getElementById("vidDisplay").value = "Show";
+          }
+        });
+
+        socket.on('count users', function(numUsers){
+          console.log('User connected' + numUsers);
+          document.getElementById("userCnt").innerHTML = "Connected Users: " + numUsers;
+          //alert(numUsers);
+        });
+      }); //end of $function
+
+      //Try to modularize the files by adding main.js but currently page refreshes upon finding main.js
+      function deleteRow(obj) {
+          //Test how sockets work
+          var index = obj.parentNode.parentNode.rowIndex;
+          socket.emit('delete row', index);
+          //socket.emit('delete row', $('#v').val()); //I am able to do this <---
+      }
+
+      function playRow(obj){
+        var index = obj.parentNode.parentNode.rowIndex;
+        socket.emit('play row', index);
+      }
+
+      function videoDisplay(){
+        socket.emit('hide video');
+      }
+
+      //TO DOOOOOOO
+      //Need to add enhanced search function -- may need to use YTAPI
+      //Need to add seeking as well as play/pause on video --
+      //not easy.. need to make own video player
+      //Can probably change how video submission works
+      //-- call function that emits to socket and pass the link
+      //Need to be able to hide video
+      //Need to add chat functionality?
+      //Need to add login?
+      //Site: https://noob-chat-test.herokuapp.com/
+      //Will rename later
+
+      //REFER  to other ytproject for mongodb connection (problem was ip listing...fokme)
+      //Test if document.getElement.. works with ejs file
+      //good work! 30% progress now??
+    </script>
+
+
+  </body>
+</html>
