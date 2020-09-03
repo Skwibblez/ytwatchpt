@@ -48,27 +48,21 @@
         </div>
     </div>
 
-    <!-- <form action="">
-      <tr>
-        <td>YouTube Link: </td>
-        <td><input id="v" autocomplete="off" /><button>Video</button></td>
-      </tr>
-    </form> -->
-
     <script src = "/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <!-- the magic is HERE -->
     <script>
       var table = document.getElementById("myTableData");
       var rowNum = myTableData.rows[table.rows.length-1].cells[0].innerHTML; //Get row_num of last column
+      rowNum++;
       console.log(rowNum);
 
       if(rowNum == "&nbsp;"){
         rowNum = 1;
       }else if(isNaN(rowNum)){
-        console.log("NUMBER IS NAN")
+        console.log("NUMBER IS NAN aka error")
+        rowNum = 1;
       }
-
 
       console.log("Table data: " + myTableData.rows[table.rows.length-1].cells[0].innerHTML)
       console.log("Row num: " + rowNum)
@@ -77,7 +71,6 @@
         // var socket = io();
         $('form').submit(function(e){
           e.preventDefault(); // prevents page reloading
-
           if($('#v').val() !== ''){   //If valid input
             //socket.emit('video link', $('#v').val());   //Sends object to server
             //String parser here -- should use YT API later
@@ -103,15 +96,7 @@
           return false;
         }); //form function
 
-        // $('form').submit(function(e){
-        //   e.preventDefault(); // prevents page reloading
-        //   socket.emit('chat message', $('#m').val());
-        //   $('#m').val('');  //Resets the textfield
-        //   return false;
-        // });
-
         //ADD CLIENT SOCKETS HERE
-
         socket.on('video link', (video) => {
           console.log(video[2]); //Just pass the object to view it
           //document.getElementById("ytvid").src = "https://www.youtube.com/embed/" + video + "?autoplay=1&loop=1";   //Rep. vid with input
@@ -207,8 +192,7 @@
       function deleteRow(obj) {
           //Test how sockets work
           var index = obj.parentNode.parentNode.rowIndex;
-          var index_row_num = myTableData.rows[table.rows.length-1].cells[0].innerHTML; //Get row_num of last column
-
+          var index_row_num = myTableData.rows[index].cells[0].innerHTML; //Get row_num of last column
           var deletion_arr = [index, index_row_num]
           console.log("Delete target row num: " + myTableData.rows[index].cells[0].innerHTML)
           socket.emit('delete row', deletion_arr);

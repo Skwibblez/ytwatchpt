@@ -33,7 +33,6 @@ MongoClient.connect(connectionString, (err, client) => {
   var numUsers = 0;
   io.on('connection', (socket) => {
     //Declare multiple sockets inside of here
-
     //Count number of connected users
     numUsers = numUsers + 1;
     io.emit('count users', numUsers);
@@ -53,7 +52,6 @@ MongoClient.connect(connectionString, (err, client) => {
       //Create obj to store in db
       //CHANGE link to redirect to main YT
       //Pass in length integrity here
-
       var myobj = {row_num: video[0], user: video[1], song_name: video[2], link: "https://www.youtube.com/embed/" + video[3], integrity: 0}
       songsCollection.insertOne(myobj)
       io.emit('video link', video);
@@ -63,12 +61,9 @@ MongoClient.connect(connectionString, (err, client) => {
     socket.on('delete row', (row) => {
       console.log("Delete row: " + row[1]); //Should output to terminal
       var deletion_number = Number(row[1]);
-
-
-      var newquery = {row_num: deletion_number};
       console.log("Deletion num: " + deletion_number);
       // songsCollection.deleteOne({row_num: 104}); //Adjust to row later -- need to find out how to synchronize rows
-      songsCollection.deleteOne(newquery);
+      songsCollection.deleteOne({row_num: deletion_number});
       io.emit('delete row', row[0]);
     });
 
