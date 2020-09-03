@@ -59,7 +59,10 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <!-- the magic is HERE -->
     <script>
-      var rowNum = 1;
+      var table = document.getElementById("myTableData");
+      var rowNum = myTableData.rows[table.rows.length-1].cells[0].innerHTML; //Get row_num of last column
+      console.log("Table data: " + myTableData.rows[table.rows.length-1].cells[0].innerHTML)
+      console.log("Row num: " + rowNum)
       var socket = io();
       $(function () {
         // var socket = io();
@@ -123,6 +126,7 @@
           var row = table.insertRow(rowCount);
           let tableHeader2 = [rowNum,user, song, link,integrity, playAll, deleteButton]
 
+          console.log("Total rows: " + rowCount);
           for(var i = 0; i < tableHeader2.length; i++){
               row.insertCell(i).innerHTML = tableHeader2[i];
           }
@@ -136,7 +140,10 @@
         socket.on('delete row', function(row){
           // var index = row.parentNode.parentNode.rowIndex;   //Pass index for deletion
           var table = document.getElementById("myTableData");
+
           table.deleteRow(row);
+          rowNum = myTableData.rows[table.rows.length-1].cells[0].innerHTML;
+          console.log("New row num: " + rowNum)
           console.log("Deleting row: " + row);
         });
 

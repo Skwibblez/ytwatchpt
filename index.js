@@ -56,11 +56,12 @@ MongoClient.connect(connectionString, (err, client) => {
       var myobj = {row_num: video[0], user: video[1], song_name: video[2], link: "https://www.youtube.com/embed/" + video[3], integrity: 0}
       songsCollection.insertOne(myobj)
       io.emit('video link', video);
-      console.log("DB video[] emitted");
+      console.log("DB video[] emitted, row num = " + video[0]);
     });
 
     socket.on('delete row', (row) => {
       console.log("Delete row: " + row); //Should output to terminal
+      songsCollection.deleteOne({row_num: 50}); //Adjust to row later -- need to find out how to synchronize rows
       io.emit('delete row', row);
     });
 
