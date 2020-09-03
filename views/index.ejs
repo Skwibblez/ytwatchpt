@@ -15,6 +15,12 @@
            src="https://www.youtube.com/embed/M68OwnWhEqY?autoplay=1&loop=1"
           frameborder="0" allow="autoplay"allowFullScreen></iframe>
           <br><input id = "vidDisplay" type = "button" value="Hide >///<" onclick="videoDisplay()"/>
+          <form action="">
+            <tr>
+              <td>YouTube Link: </td>
+              <td><input id="v" autocomplete="off" /><button>Video</button></td>
+            </tr>
+          </form>
         </div>
         <div>
           <table id="myTableData"  border="1" cellpadding="2">
@@ -42,12 +48,12 @@
         </div>
     </div>
 
-    <form action="">
+    <!-- <form action="">
       <tr>
         <td>YouTube Link: </td>
         <td><input id="v" autocomplete="off" /><button>Video</button></td>
       </tr>
-    </form>
+    </form> -->
 
     <script src = "/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
