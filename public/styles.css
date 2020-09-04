@@ -50,6 +50,9 @@
   outline: none;
   font-size: 15px;
 }
+#song_col{
+  width:250px;
+}
 
 body {
   background-image: url('https://hdwallpapers.cat/wallpaper/grisaia-no-kajitsu-suou-amane-girl-video-cg-8hWG.jpg');
