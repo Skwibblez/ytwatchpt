@@ -221,12 +221,12 @@
         socket.on('play row', function(row){
           var table = document.getElementById("myTableData");
           var x = document.getElementById("myTableData").rows[row].cells;
-          var newLink = x[3].innerHTML;     //Invisible space added at end for some reason
+          var newLink = x[2].innerHTML;     //Invisible space added at end for some reason
           console.log("start"+newLink+"end")
           console.log("Length: " + newLink.length)
           if(newLink != ""){
             //Bad fix -- links from db have extra char but newly added songs dont
-            if(x[4].innerHTML == 0){
+            if(x[3].innerHTML == 0){
                 var inputVideo = newLink + "?autoplay=1";
                 console.log("0 detected")
             }else{
