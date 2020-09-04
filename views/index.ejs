@@ -26,17 +26,17 @@
         <div>
           <table id="myTableData"  border="1" cellpadding="2">
             <tr>
-                <td>&nbsp;</td>
+                <td id="row_col">&nbsp;</td>
                 <td id="song_col"><b>Song</b></td>
-                <td><b>Link</b></td>
-                <td><b>Int</b></td>
-                <td><b>Play </b></td>
-                <td><b>Delete Song</b></td>
+                <td id="link_col"><b>Link</b></td>
+                <td id="int_col"><b>Int</b></td>
+                <td id="play_col"><b>Play </b></td>
+                <td id="del_col"><b>Delete Song</b></td>
             </tr>
             <% for(var i = 0; i < songs.length; i++) {%>
                 <tr>
                     <td><%=songs[i].row_num%></td>
-                    <td><%=songs[i].song_name%></td>
+                    <td id="song_col"><%=songs[i].song_name%></td>
                     <td><%=songs[i].link%> </td>
                     <td>1</td>
                     <td><input type="button" value = "Play" onClick="Javacsript:playRow(this)"></td>
