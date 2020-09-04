@@ -15,6 +15,7 @@
            src="https://www.youtube.com/embed/M68OwnWhEqY?autoplay=1&loop=1"
           frameborder="0" allow="autoplay"allowFullScreen></iframe>
           <br><input id = "vidDisplay" type = "button" value="Hide >///<" onclick="videoDisplay()"/>
+          <div id="player"></div>
           <form action="">
             <tr>
               <td>YouTube Link: </td>
@@ -26,7 +27,6 @@
           <table id="myTableData"  border="1" cellpadding="2">
             <tr>
                 <td>&nbsp;</td>
-                <td><b>User</b></td>
                 <td id="song_col"><b>Song</b></td>
                 <td><b>Link</b></td>
                 <td><b>Int</b></td>
@@ -36,7 +36,6 @@
             <% for(var i = 0; i < songs.length; i++) {%>
                 <tr>
                     <td><%=songs[i].row_num%></td>
-                    <td><%=songs[i].user %></td>
                     <td><%=songs[i].song_name%></td>
                     <td><%=songs[i].link%> </td>
                     <td>1</td>
@@ -45,6 +44,7 @@
                 </tr>
             <% } %>
           </table>
+
         </div>
     </div>
 
@@ -54,6 +54,39 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <!-- the magic is HERE -->
     <script>
+
+    ////////  START ///////////////
+      // var tag = document.createElement('script');
+      // tag.src = "https://www.youtube.com/iframe_api";
+      // var firstScriptTag = document.getElementsByTagName('script')[0];
+      // firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      //
+      // var player;
+      // function onYouTubeIframeAPIReady() {
+      //   player = new YT.Player('player', {
+      //     height: '480',
+      //     width: '720',
+      //     videoId: 'XPkNhfWju28',
+      //     events: {
+      //       'onReady': onPlayerReady,
+      //       'onStateChange': onPlayerStateChange
+      //     },
+      //     playerVars:{
+      //       'origin':'localhost:1111'
+      //     }
+      //   });
+      // }
+      // function onPlayerReady(event) {
+      //   event.target.playVideo();
+      // }
+      // var done = false;
+      // function onPlayerStateChange(event) {
+      //   // if (event.data == YT.PlayerState.PLAYING && !done) {
+      //   //   setTimeout(stopVideo, 6000);
+      //   //   done = true;
+      //   // }
+      // }
+      ////////END ///////////////
       var table = document.getElementById("myTableData");
       var rowNum = myTableData.rows[table.rows.length-1].cells[0].innerHTML; //Get row_num of last column
       rowNum++;
@@ -88,7 +121,7 @@
                 var results = response.result;
                 var client_url = $('#v').val().substring(n+1, length);
                 var song_name = results.items[0].snippet.title;
-                var message_detail_link = [rowNum,"user", song_name, client_url];
+                var message_detail_link = [rowNum, song_name, client_url];
                 socket.emit('db vid link', message_detail_link);  //Send data to server
                 rowNum++;
                 console.log("In request song name(title): " + song_name)
@@ -109,7 +142,7 @@
                 $.each(results.items, function(index,item){
                   var client_url = item.id.videoId
                   var song_name = results.items[0].snippet.title;
-                  var message_detail_searched = [rowNum,"user", song_name, client_url];
+                  var message_detail_searched = [rowNum,song_name, client_url];
                   socket.emit('db vid link', message_detail_searched);  //Send data to server
                   rowNum++;
                   console.log("ID: " + item.id.videoId);
@@ -134,9 +167,9 @@
 
         //ADD CLIENT SOCKETS HERE
         socket.on('video link', (video) => {
-          console.log(video[2]); //Just pass the object to view it
+          console.log(video[1]); //Just pass the object to view it
           //document.getElementById("ytvid").src = "https://www.youtube.com/embed/" + video + "?autoplay=1&loop=1";   //Rep. vid with input
-          var link = "https://www.youtube.com/embed/" + video[3];
+          var link = "https://www.youtube.com/embed/" + video[2];
           var table = document.getElementById("myTableData");   //Append to table
 
           if(link.length > 60){
@@ -144,8 +177,7 @@
             return; //use this in real code -- leave along for testing purposes
           }
 
-          var user = 'user';
-          var song =  video[2];
+          var song =  video[1];
           var integrity = 0;
           //Buttons
           var playAll = '<input type="button" value = "Play" onClick="Javacsript:playRow(this)">';  //Change to button
@@ -154,7 +186,7 @@
           //Insert data into row into table
           var rowCount = table.rows.length;
           var row = table.insertRow(rowCount);
-          let tableHeader2 = [video[0],user, song, link,integrity, playAll, deleteButton]
+          let tableHeader2 = [video[0], song, link,integrity, playAll, deleteButton]
 
           console.log("Total rows: " + rowCount);
           for(var i = 0; i < tableHeader2.length; i++){
@@ -261,18 +293,18 @@
       }
 
       //TO DOOOOOOO
-      //Need to add enhanced search function -- may need to use YTAPI
-      //Need to add seeking as well as play/pause on video --
+      //Need to add enhanced search function -- may need to use YTAPI -- done
+      //Need to add seeking as well as play/pause on video -- next?
       //not easy.. need to make own video player
-      //Can probably change how video submission works
-      //-- call function that emits to socket and pass the link
-      //Need to add chat functionality?
-      //Need to add login?
+      //Can probably change how video submission works -- done
+      //-- call function that emits to socket and pass the link -- done
+      //Need to add chat functionality? --skip prolly
+      //Need to add login? --skip prolly
       //Site: https://noob-chat-test.herokuapp.com/
       //Will rename later
 
       //REFER  to other ytproject for mongodb connection (problem was ip listing...fokme)
-      //good work! 30% progress now??
+      //50% progress now??
     </script>
   <script src="https://apis.google.com/js/client.js?onload=init"></script>
 
