@@ -73,25 +73,6 @@
         // var socket = io();
         $('form').submit(function(e){
           e.preventDefault(); // prevents page reloading
-          //Testing api -- functional -- need to find specific data from it now -ok
-          // var request = gapi.client.youtube.search.list({
-          //   part:"snippet",
-          //   type:"video",
-          //   q: $("#v").val(),
-          //   maxResults: 5,
-          //   order: "viewCount"
-          // });
-          // request.execute(function(response){
-          //   var results = response.result;
-          //   $.each(results.items, function(index,item){
-          //     //MAKE CHANGES HERE
-          //     //Idea: generate table using this
-          //     socket.emit('testing', item.snippet.title);
-          //     //Emit to server from within here along with other logic
-          //     console.log(item.snippet.title);
-          //   });
-          // });//execute
-          //End api addition
 
           if($('#v').val() !== ''){   //If valid input
             //socket.emit('video link', $('#v').val());   //Sends object to server
@@ -99,26 +80,22 @@
             var n = $('#v').val().indexOf("=");
             var length = $('#v').val().length;
             if(n !== -1){   //Checking for specific ID
-              //socket.emit('video link', $('#v').val().substring(n+1, length));
-
               //////NEW
               var vid_id = $('#v').val().substring(n+1, length)
-              var song_name = ""
               var requestLink = gapi.client.youtube.videos.list({
                 part:"snippet",
                 id: vid_id
               });
-
               requestLink.execute(function(response){
                 var results = response.result;
-                var client_string = $('#v').val().substring(n+1, length);
-                console.log("Client_string" + client_string)
-                song_name = results.items[0].snippet.title;
-                console.log("In request song name(title): " + song_name)
-                var messageDetail = [rowNum,"user", song_name, $('#v').val().substring(n+1, length)];
-                socket.emit('db vid link', messageDetail);  //Send data to server
+                var client_url = $('#v').val().substring(n+1, length);
+                var song_name = results.items[0].snippet.title;
+                var message_detail_link = [rowNum,"user", song_name, client_url];
+                socket.emit('db vid link', message_detail_link);  //Send data to server
                 rowNum++;
-                $('#v').val('');
+                console.log("In request song name(title): " + song_name)
+                console.log("Client_string" + client_url)
+                $('#v').val('');  //Reset textfield
               });
                 //////NEW
               // console.log("Post request song name: " + song_name)
@@ -126,14 +103,45 @@
               // socket.emit('db vid link', messageDetail);  //Send data to server
               // rowNum++;
             }else{
-              alert("Invalid youtube link");
+              //Temporary -- just pick first search result
+              //Testing api -- functional -- need to find specific data from it now -ok
+              //Can search any string and return title
+              var request = gapi.client.youtube.search.list({
+                part:"snippet",
+                type:"video",
+                q: $("#v").val(),
+                maxResults: 1,
+                order: "relevance"
+              });
+              request.execute(function(response){
+                var results = response.result;
+                $.each(results.items, function(index,item){
+                  //socket.emit('testing', item.snippet.title); //emits result title
+                  //Emit to server from within here along with other logic
+                  //console.log(item.snippet.title);  //prints title
+
+                  var client_url = item.id.videoId
+                  var song_name = results.items[0].snippet.title;
+                  var message_detail_searched = [rowNum,"user", song_name, client_url];
+                  socket.emit('db vid link', message_detail_searched);  //Send data to server
+
+                  rowNum++;
+                  console.log("ID: " + item.id.videoId);
+                  console.log("In request song name(title): " + song_name)
+                  console.log("Client_url" + client_url)
+                  $('#v').val('');
+                });
+              });//execute
+              //End api addition
+              alert("Searched");
             }
             console.log("Length: " + length);
-            console.log("New string: " + $('#v').val().substring(n+1, length));
+            //console.log("New string: " + $('#v').val().substring(n+1, length));
             console.log("Index: " + n);
           }else{
-            alert("Empty video!")
-          }
+
+          }//else
+
           // socket.emit('chat message', $('#m').val());
           // $('#v').val('');  //Resets the textfield
           return false;
@@ -167,10 +175,8 @@
           for(var i = 0; i < tableHeader2.length; i++){
               row.insertCell(i).innerHTML = tableHeader2[i];
           }
-
           document.getElementById("v").value = "";  //Reset textfield value
           document.getElementById("v").focus();
-
         });
 
         //Need to do something to delete row -- need to know how to pass around correct index/object to delete
