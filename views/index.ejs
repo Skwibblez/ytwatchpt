@@ -48,6 +48,8 @@
         </div>
     </div>
 
+<!--=============================== JavaScript below=======================================----->
+
     <script src = "/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <!-- the magic is HERE -->
@@ -71,6 +73,26 @@
         // var socket = io();
         $('form').submit(function(e){
           e.preventDefault(); // prevents page reloading
+          //Testing api -- functional -- need to find specific data from it now -ok
+          // var request = gapi.client.youtube.search.list({
+          //   part:"snippet",
+          //   type:"video",
+          //   q: $("#v").val(),
+          //   maxResults: 5,
+          //   order: "viewCount"
+          // });
+          // request.execute(function(response){
+          //   var results = response.result;
+          //   $.each(results.items, function(index,item){
+          //     //MAKE CHANGES HERE
+          //     //Idea: generate table using this
+          //     socket.emit('testing', item.snippet.title);
+          //     //Emit to server from within here along with other logic
+          //     console.log(item.snippet.title);
+          //   });
+          // });//execute
+          //End api addition
+
           if($('#v').val() !== ''){   //If valid input
             //socket.emit('video link', $('#v').val());   //Sends object to server
             //String parser here -- should use YT API later
@@ -78,13 +100,34 @@
             var length = $('#v').val().length;
             if(n !== -1){   //Checking for specific ID
               //socket.emit('video link', $('#v').val().substring(n+1, length));
-              var messageDetail = [rowNum,"user_", "song_name", $('#v').val().substring(n+1, length)];
-              socket.emit('db vid link', messageDetail);
-              rowNum++;
+
+              //////NEW
+              var vid_id = $('#v').val().substring(n+1, length)
+              var song_name = ""
+              var requestLink = gapi.client.youtube.videos.list({
+                part:"snippet",
+                id: vid_id
+              });
+
+              requestLink.execute(function(response){
+                var results = response.result;
+                var client_string = $('#v').val().substring(n+1, length);
+                console.log("Client_string" + client_string)
+                song_name = results.items[0].snippet.title;
+                console.log("In request song name(title): " + song_name)
+                var messageDetail = [rowNum,"user", song_name, $('#v').val().substring(n+1, length)];
+                socket.emit('db vid link', messageDetail);  //Send data to server
+                rowNum++;
+                $('#v').val('');
+              });
+                //////NEW
+              // console.log("Post request song name: " + song_name)
+              // var messageDetail = [rowNum,"user_", "song_name", $('#v').val().substring(n+1, length)];
+              // socket.emit('db vid link', messageDetail);  //Send data to server
+              // rowNum++;
             }else{
               alert("Invalid youtube link");
             }
-
             console.log("Length: " + length);
             console.log("New string: " + $('#v').val().substring(n+1, length));
             console.log("Index: " + n);
@@ -92,7 +135,7 @@
             alert("Empty video!")
           }
           // socket.emit('chat message', $('#m').val());
-          $('#v').val('');  //Resets the textfield
+          // $('#v').val('');  //Resets the textfield
           return false;
         }); //form function
 
@@ -108,8 +151,8 @@
             return; //use this in real code -- leave along for testing purposes
           }
 
-          var user = 'Update later';
-          var song = "Update later";
+          var user = 'user';
+          var song =  video[2];
           var integrity = 0;
           //Buttons
           var playAll = '<input type="button" value = "Play" onClick="Javacsript:playRow(this)">';  //Change to button
@@ -150,7 +193,6 @@
           var x = document.getElementById("myTableData").rows[row].cells;
           var newLink = x[3].innerHTML;     //Invisible space added at end for some reason
           console.log("start"+newLink+"end")
-
           console.log("Length: " + newLink.length)
           if(newLink != ""){
             //Bad fix -- links from db have extra char but newly added songs dont
@@ -186,6 +228,10 @@
           document.getElementById("userCnt").innerHTML = "Connected Users: " + numUsers;
           //alert(numUsers);
         });
+
+        socket.on('output title', function(newTitle){
+          console.log("Client side title: " + newTitle);
+        });
       }); //end of $function
 
       //Try to modularize the files by adding main.js but currently page refreshes upon finding main.js
@@ -207,6 +253,14 @@
       function videoDisplay(){
         socket.emit('hide video');
       }
+      //Attempt to add YTAPI
+      function init(){
+        gapi.client.setApiKey("AIzaSyAok0QgaPlQstcwKOKEOw641a3aRJZ4qmw");
+        console.log("init connected");
+        gapi.client.load("youtube", "v3", function(){
+          // yt api rdy
+        });
+      }
 
       //TO DOOOOOOO
       //Need to add enhanced search function -- may need to use YTAPI
@@ -222,7 +276,7 @@
       //REFER  to other ytproject for mongodb connection (problem was ip listing...fokme)
       //good work! 30% progress now??
     </script>
-
+  <script src="https://apis.google.com/js/client.js?onload=init"></script>
 
   </body>
 </html>

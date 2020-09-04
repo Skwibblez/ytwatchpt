@@ -33,8 +33,7 @@ MongoClient.connect(connectionString, (err, client) => {
   var numUsers = 0;
   io.on('connection', (socket) => {
     //Declare multiple sockets inside of here
-    //Count number of connected users
-    numUsers = numUsers + 1;
+    numUsers = numUsers + 1;  //Count number of connected users
     io.emit('count users', numUsers);
 
     socket.on('disconnect', () =>{
@@ -49,22 +48,22 @@ MongoClient.connect(connectionString, (err, client) => {
     });
 
     socket.on('db vid link', (video) => {
-      //Create obj to store in db
-      //CHANGE link to redirect to main YT
+      //Create obj to store in db || CHANGE link to redirect to main YT
       //Pass in length integrity here
       var myobj = {row_num: video[0], user: video[1], song_name: video[2], link: "https://www.youtube.com/embed/" + video[3], integrity: 0}
       songsCollection.insertOne(myobj)
       io.emit('video link', video);
       console.log("DB video[] emitted, row num = " + video[0]);
+      console.log("Title inputted: " + video[2]);
+      console.log("Video inputted: " + "https://www.youtube.com/embed/" + video[3]);
     });
 
     socket.on('delete row', (row) => {
-      console.log("Delete row: " + row[1]); //Should output to terminal
       var deletion_number = Number(row[1]);
-      console.log("Deletion num: " + deletion_number);
-      // songsCollection.deleteOne({row_num: 104}); //Adjust to row later -- need to find out how to synchronize rows
       songsCollection.deleteOne({row_num: deletion_number});
       io.emit('delete row', row[0]);
+      console.log("Delete row: " + row[1]); //Should output to terminal
+      console.log("Deletion num: " + deletion_number);
     });
 
     socket.on('play row', (row) => {
@@ -76,34 +75,18 @@ MongoClient.connect(connectionString, (err, client) => {
       io.emit('hide video');
     });
 
+    socket.on('testing',(title)=>{
+      console.log("Test recieved:" + title)
+      io.emit('output title', title);
+    });
+
   }); //io connection
-
-
 })//mongodb client
-
-
-
-// socket.on('chat message', (msg) => {
-//   console.log("Message: " + msg); //Should output to terminal
-//   io.emit('chat message', msg);
-// });
-//'
-
-// io.on('connection', (socket) => {
-//   socket.on('chat message', (msg) => {
-//     console.log('message: ' + msg);
-//   });
-// });
-
-// io.on('connection', (socket) => {
-//   console.log('a user connected');
-//   socket.on('disconnect', () => {
-//     console.log('user disconnected');
-//   });
-// });
-
 
 var PORT = process.env.PORT || 2222;
 http.listen(PORT, () => {
   console.log('listening on *:2222');
 });
+
+
+// });
