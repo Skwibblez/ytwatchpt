@@ -14,7 +14,8 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(bodyParser.urlencoded({ extended: true }))
 
 const connectionString = process.env.MONGODB_URI || 'mongodb+srv://skwibblez:7utakoe@grisaia.jyhgf.mongodb.net/skwibblez?retryWrites=true&w=majority';
-
+// res.render('index.ejs', {songs: results})
+var server_auto_row;
 MongoClient.connect(connectionString, (err, client) => {
   if (err) return console.error(err)
   console.log('Connected to Database')
@@ -28,14 +29,17 @@ MongoClient.connect(connectionString, (err, client) => {
           res.render('index.ejs', {songs: results})
         })
         .catch(error => console.error(error))
+          console.log("Upon enter auto row: " + server_auto_row)
   });//app.get
 
   var numUsers = 0;
+  var runningIndex = 1;
   io.on('connection', (socket) => {
     //Declare multiple sockets inside of here
     numUsers = numUsers + 1;  //Count number of connected users
     io.emit('count users', numUsers);
-
+    io.emit('update running_index', runningIndex);
+    console.log("Running index: " + runningIndex)
     socket.on('disconnect', () =>{
       console.log('user disconnected');
       numUsers = numUsers -1;
@@ -50,7 +54,11 @@ MongoClient.connect(connectionString, (err, client) => {
     socket.on('db vid link', (video) => {
       //Create obj to store in db || CHANGE link to redirect to main YT
       //Pass in length integrity here
-      var myobj = {row_num: video[0], song_name: video[1], link: "https://www.youtube.com/embed/" + video[2], integrity: 0}
+      var myobj = {row_num: video[0],
+        song_name: video[1],
+        link: "https://www.youtube.com/embed/" + video[2],
+        integrity: 0
+      };
       songsCollection.insertOne(myobj)
       io.emit('video link', video);
       console.log("DB video[] emitted, row num = " + video[0]);
@@ -68,7 +76,10 @@ MongoClient.connect(connectionString, (err, client) => {
 
     socket.on('play row', (row) => {
       console.log("Play row: " + row); //Should output to terminal
+      runningIndex = row;
+      server_auto_row = row;
       io.emit('play row', row);
+      console.log("New server auto row: " + server_auto_row)
     });
 
     socket.on('hide video',() =>{
@@ -80,6 +91,25 @@ MongoClient.connect(connectionString, (err, client) => {
       io.emit('output title', title);
     });
 
+    socket.on('server play',() =>{
+      console.log("Server play detected");
+      io.emit('client play');
+    });
+
+    socket.on('server pause',() =>{
+      console.log("Server pause detected");
+      io.emit('client pause');
+    });
+
+    socket.on('server autoplay', () =>{
+      console.log("Server autoplay detected")
+      io.emit('client autoplay');
+    });
+    //var signalOn = 0;
+    socket.on('stop multi',()=>{
+      console.log("Stop multi detected")
+      // io.emit('client autoplay');
+    });
   }); //io connection
 })//mongodb client
 
