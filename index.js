@@ -43,7 +43,7 @@ MongoClient.connect(connectionString, (err, client) => {
     setTimeout(function(){
       io.emit('find playing vid')
     }, 1000);
-
+    // io.emit('find playing vid')
 
     socket.on('update to playing vid',(newVideo)=>{
       console.log("Updating to palying vid emitted -- server")
@@ -51,10 +51,6 @@ MongoClient.connect(connectionString, (err, client) => {
       console.log("new vid[1]" + newVideo[1])
       //Send back to clients and check if newUser is true
       io.emit('update client playing vid',newVideo)
-    });
-
-    socket.on('progress bar seek',(seekTime)=>{
-      io.emit('client bar seek', seekTime);
     });
 
     socket.on('disconnect', () =>{
@@ -123,6 +119,10 @@ MongoClient.connect(connectionString, (err, client) => {
       io.emit('client autoplay');
     });
     //var signalOn = 0;
+    socket.on('progress bar seek',(seekTime)=>{
+      io.emit('client bar seek', seekTime);
+    });
+
     socket.on('stop multi',()=>{
       console.log("Stop multi detected")
       // io.emit('client autoplay');

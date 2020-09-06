@@ -4,6 +4,20 @@
   margin-bottom:5px;
 }
 
+#playButton{
+  width: 80px;
+  height: 40px;
+}
+
+#pauseButton{
+  width: 80px;
+  height: 40px;
+}
+#vidDisplay{
+  width: 75px;
+  height: 27px;
+}
+
 #buttonset{
   display:block;
 }
@@ -27,6 +41,19 @@
   margin-bottom:5px;
 }
 
+#tableDiv{
+  overflow:hidden;
+  overflow-y: scroll;
+  height: 850px;
+}
+
+table thead tr th {
+  text-align: left;
+  position: sticky;
+  top: 0px;
+  background-color: white;
+  /* color: #fff; */
+}
 #myTableData{
   float: "left";
 }
@@ -59,23 +86,6 @@
   width:250px;
   opacity: 1;
 }
-
-/* #row_col{
-  width:10px;
-}
-
-#link_col{
-  width:60px;
-}
-#int_col{
-  width:5px;
-}
-#play_col{
-  width:20px;
-}
-#del_col{
-  width:50px;
-} */
 
 body {
   background-image: url('https://hdwallpapers.cat/wallpaper/grisaia-no-kajitsu-suou-amane-girl-video-cg-8hWG.jpg');
