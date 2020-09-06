@@ -53,6 +53,10 @@ MongoClient.connect(connectionString, (err, client) => {
       io.emit('update client playing vid',newVideo)
     });
 
+    socket.on('progress bar seek',(seekTime)=>{
+      io.emit('client bar seek', seekTime);
+    });
+
     socket.on('disconnect', () =>{
       console.log('user disconnected');
       numUsers = numUsers -1;

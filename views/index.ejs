@@ -12,11 +12,19 @@
     <div class = "flex-container">
         <div>
           <div id="player"></div>
-          <!-- <br><button type="button" onclick="playVideo()">Play >///< </button>
-          <button type="button" onclick="pauseVideo()">Pause >///< </button>
-          <br><button type="button" onclick="test()">Change Video >///< </button>
-          <br><button type="button" onclick="autoplay()">Autoplay >///< </button> -->
-          <br><input id = "vidDisplay" type = "button" value="Hide >///<" onclick="videoDisplay()"/>
+          <br><button type="button" onclick="playVideo()">(⁄ ⁄>⁄ ▽ ⁄<⁄ ⁄) </button>
+          <button type="button" onclick="pauseVideo()"> ٩(ఠ益ఠ)۶</button>
+
+          <div id ="progressBar" style="width: 600px; height: 35px; margin-left: 10px;">
+            <div id="line" style="border: 1px solid black;width: 600px;height: 0px;top: 50%;position: relative"></div>
+            <div id = "square" style="height: 15px;width: 15px;position: relative;border-width: 2px;border-style: solid;top: 8.5px;left: 0%"></div>
+          </div>
+
+          <div id="buttonset">
+            <!-- <br><button type="button" onclick="test()">Test button >///< </button>
+            <br><button type="button" onclick="autoplay()">Randomize tbi >///< </button> -->
+            <br><input id = "vidDisplay" type = "button" value="Hide >///<" onclick="videoDisplay()"/>
+          </div>
           <form action="">
             <tr>
               <td>YouTube Link: </td>
@@ -68,7 +76,32 @@
       //For updating new users
       var newUser = true;
       var totalUsers = 1;
+      var socket = io();
       ////////END ///////////////
+      /////Adding timeline///////
+      var bar = document.getElementById('progressBar');
+      var progressBar = $('.progressBar');
+      var progressSquare = $('#square');
+      bar.addEventListener('click',function(e){
+        console.log("Progress bar has been clicked");
+        var difOffset = (e.pageX - this.offsetLeft)/600 * 100;
+        console.log("Offset: " +difOffset);
+        //Translate offset into time and call seek
+        //Convert offSet into time
+        var seekTime = difOffset * player.getDuration() / 100;
+        console.log("Fraction: " + seekTime);
+        //var fraction = difOffset * player.getCurrentTime()/player.getDuration()*100;
+        progressSquare.css("left",difOffset.toString() + "%");  //Moves square to correct position
+        //Need to emit
+        socket.emit('progress bar seek', seekTime);
+        //player.seekTo(seekTime,true);
+      });
+
+      socket.on('client bar seek',function(seekTime){
+        console.log("client bar seek detected")
+        player.seekTo(seekTime,true);
+      });
+      /////End timeline////////
       var table = document.getElementById("myTableData");
       var rowNum = myTableData.rows[table.rows.length-1].cells[0].innerHTML; //Get row_num of last column
       rowNum++;
@@ -85,7 +118,7 @@
       console.log("Table data: " + myTableData.rows[table.rows.length-1].cells[0].innerHTML)
       console.log("Row num: " + rowNum)
 
-      var socket = io();
+
       $(function () {
         //Main search function
         $('form').submit(function(e){
@@ -300,8 +333,6 @@
         console.log("Test outside func works!");
       });
 
-
-
       //Try to modularize the files by adding main.js but currently page refreshes upon finding main.js
       function deleteRow(obj) {
           //Test how sockets work
@@ -342,7 +373,19 @@
             console.log("Video done -- autoplay undetected");
           }
         }else if(player.getPlayerState() == 1){
-          console.log("playing")
+          console.log("playing -- start progress bar")
+          setInterval(function(){
+            if(player == null || progressBar == null){
+              return;
+            }
+            var fraction = player.getCurrentTime()/player.getDuration()*100;
+            // console.log("Play current time: " + player.getCurrentTime());
+            // console.log("Total: " + player.getDuration());
+            // console.log("Fraction: " + fraction);
+            // console.log("Fraction: " + fraction);
+            progressSquare.css("left",fraction.toString() + "%");
+          },200);
+
         }else if(player.getPlayerState() == 2){
           console.log("paused")
         }
@@ -362,30 +405,9 @@
         // var x = "0VvMKJ4IuWM"
         // player.loadVideoById(x);
         // socket.emit('server autoplay');
-        var updatingVid = player.getVideoEmbedCode();
-        console.log("nani")
-        console.log("Video detail: " + updatingVid);
-        //Now get the time and id || link
-        var time = player.getCurrentTime()
-        var newUrl = player.getVideoUrl()
-        var newVidId = player.getVideoData()['video_id'];
-        console.log("ID: " + id)
-        console.log("Time: " + time)
-        console.log("New url:" + newUrl +"end");
-        //Code for playing it
-        // var sup = 'P9njO8cyo-M';
-        // var time = 70.332
-        // player.loadVideoById({'videoId': sup,
-        //                'startSeconds': time,
-        //                });
-        // player.seekTo(70.3332, true);
-        // socket.emit('new testing');
-        // var table_row_len = table.rows.length;
-        // console.log('Table len = ' + table_row_len)
-        // console.log("Current time: " + player.getCurrentTime())
-        // console.log("Time: " + player.getDuration())
-        // console.log("Test is working")
-        // console.log("Auto row num: " + autoRowNum);
+        progressBarLoop();
+        console.log("Calling progress bar loop")
+
       }
       //Stuff for existing user
       socket.on('find playing vid',function(){
@@ -409,13 +431,11 @@
         console.log("Update to playing vid recieved -client")
         if(newUser){
           //player.loadVideoById(newVideo[0]);
-          var x = "0VvMKJ4IuWM"
+          // var x = "0VvMKJ4IuWM"
           // player.loadVideoById(x)
           // player.seekTo(newVideo[1]);
 
-          setTimeout(function(){
-            // player.loadVideoById(newVideo[0])
-            // player.seekTo(newVideo[1]);
+          setTimeout(function(){  //Optimize later(use ready state)
             player.loadVideoById({'videoId': newVideo[0],
                  'startSeconds': newVideo[1]+1.5
                });
@@ -457,7 +477,7 @@
       //TO DOOOOOOO
       //Need to add enhanced search function -- may need to use YTAPI -- done
       //Need to add seeking as well as play/pause on video -- next?
-      //seeking() need to implement timeline
+      //seeking() need to implement timeline -- done
       //Can probably change how video submission works -- done
       //-- call function that emits to socket and pass the link -- done
       //Need to add chat functionality? --skip prolly
@@ -465,8 +485,11 @@
       //Site: https://noob-chat-test.herokuapp.com/
       //Will rename later
 
+      //Make syncing function better rather than +1.5 -- todo
+      //Turn table into scrollable --todo
+      //Enhance progress bar for draggability --todo
       //REFER  to other ytproject for mongodb connection (problem was ip listing...fokme)
-      //50% progress now??
+      //90% progress now??
     </script>
   <script src="https://apis.google.com/js/client.js?onload=init"></script>
 

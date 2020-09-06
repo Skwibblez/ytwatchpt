@@ -4,6 +4,10 @@
   margin-bottom:5px;
 }
 
+#buttonset{
+  display:block;
+}
+
 #picDiv{
   /*float:right;*/
 }
