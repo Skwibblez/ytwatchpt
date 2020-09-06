@@ -44,7 +44,7 @@
 #tableDiv{
   overflow:hidden;
   overflow-y: scroll;
-  height: 800px;
+  height: 850px;
 }
 
 table thead tr th {
