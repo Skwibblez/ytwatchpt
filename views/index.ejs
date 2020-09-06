@@ -17,7 +17,6 @@
           <br><button type="button" onclick="test()">Change Video >///< </button>
           <br><button type="button" onclick="autoplay()">Autoplay >///< </button> -->
           <br><input id = "vidDisplay" type = "button" value="Hide >///<" onclick="videoDisplay()"/>
-
           <form action="">
             <tr>
               <td>YouTube Link: </td>
@@ -66,6 +65,9 @@
 
       var autoplay = true;
       var runningIndex = 1;
+      //For updating new users
+      var newUser = true;
+      var totalUsers = 1;
       ////////END ///////////////
       var table = document.getElementById("myTableData");
       var rowNum = myTableData.rows[table.rows.length-1].cells[0].innerHTML; //Get row_num of last column
@@ -82,6 +84,7 @@
 
       console.log("Table data: " + myTableData.rows[table.rows.length-1].cells[0].innerHTML)
       console.log("Row num: " + rowNum)
+
       var socket = io();
       $(function () {
         //Main search function
@@ -142,155 +145,162 @@
           return false;
         }); //form function
 
-        //ADD CLIENT SOCKETS HERE
-        socket.on('video link', (video) => {
-          console.log(video[1]); //Just pass the object to view it
-          var link = "https://www.youtube.com/embed/" + video[2];
-          var table = document.getElementById("myTableData");   //Append to table
-
-          if(link.length > 60){
-            alert("Foh nga");
-            return; //use this in real code -- leave along for testing purposes
-          }
-
-          var song =  video[1];
-          var integrity = 0;
-          //Buttons
-          var playAll = '<input type="button" value = "Play" onClick="Javacsript:playRow(this)">';  //Change to button
-          var deleteButton = '<input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)">';
-
-          //Insert data into row into table
-          var rowCount = table.rows.length;
-          var row = table.insertRow(rowCount);
-          let tableHeader2 = [video[0], song, link,integrity, playAll, deleteButton]
-
-          console.log("Total rows: " + rowCount);
-          for(var i = 0; i < tableHeader2.length; i++){
-              row.insertCell(i).innerHTML = tableHeader2[i];
-          }
-          rowNum = myTableData.rows[table.rows.length-1].cells[0].innerHTML;
-          rowNum++;
-          console.log("Adding New row num: " + rowNum)
-          if(isNaN(rowNum)){
-            rowNum = 1;
-            console.log("Adjusting adding row num: " + rowNum)
-          }
-          document.getElementById("v").value = "";  //Reset textfield value
-          document.getElementById("v").focus();
-        });
-
-        socket.on('delete row', function(row){
-          // var index = row.parentNode.parentNode.rowIndex;   //Pass index for deletion
-          var table = document.getElementById("myTableData");
-          table.deleteRow(row);
-          rowNum = myTableData.rows[table.rows.length-1].cells[0].innerHTML;
-          rowNum++;
-          console.log("Deleting row: " + row);
-          console.log("New row num: " + rowNum)
-          if(isNaN(rowNum)){
-            rowNum = 1;
-            console.log("Adjusting row num: " + rowNum)
-          }
-          console.log("Deleting row: " + row);
-        });
-
-        socket.on('play row', function(row){
-          console.log("Play row detected")
-          console.log("Playing row: " + row);
-          runningIndex = row;
-          var x = document.getElementById("myTableData").rows[row].cells;
-          var newLink = x[2].innerHTML;     //Invisible space added at end for some reason
-          console.log("start"+newLink+"end")
-          console.log("Length: " + newLink.length)
-          if(newLink != ""){
-            //Bad fix -- links from db have extra char but newly added songs dont
-            if(x[3].innerHTML == 0){
-                var inputVideo = newLink + "?autoplay=1";
-                console.log("0 detected")
-            }else{
-              var inputVideo = newLink.substring(0,newLink.length-1) + "?autoplay=1";
-            }
-            player.loadVideoByUrl(inputVideo);  //Video baseds on url || can do id
-            console.log("InputVid: " + inputVideo);
-            console.log("Successfully inputted!");
-          }else{
-            console.log("Link is empty");
-          }
-        });
-
-        socket.on('hide video', function(){
-          var z = document.getElementById("player");
-          if (z.style.display === "none") {
-            z.style.display = "block";
-            document.getElementById("vidDisplay").value = "Hide >///<";
-          } else {
-            z.style.display = "none";
-            document.getElementById("vidDisplay").value = "Show oWo";
-          }
-        });
-
-        socket.on('count users', function(numUsers){
-          console.log('User connected' + numUsers);
-          document.getElementById("userCnt").innerHTML = "Connected Users: " + numUsers;
-        });
-
-        socket.on('output title', function(newTitle){
-          console.log("Client side title: " + newTitle);
-        });
-
-        socket.on('client play', function(){
-          player.playVideo();
-        });
-
-        socket.on('client pause', function(){
-          player.pauseVideo();
-        });
-
-        socket.on('client autoplay', function(){
-          console.log("client autoplay detected");
-          console.log("Should play row: " + autoRowNum) //Add 1 to this
-          //Check if next row exists
-          var table_row_len = table.rows.length;
-          var autoplayer_link;
-          console.log('Table len = ' + table_row_len);
-
-          //For circular
-          if(table_row_len > 1){
-            if(runningIndex +1 >= table_row_len){ //End of list
-              var x = document.getElementById("myTableData").rows[1].cells
-              console.log("End of list -- go back to beginning");
-              autoplayer_link = myTableData.rows[1].cells[2].innerHTML;
-              if(x[3].innerHTML == 1){
-                autoplayer_link = autoplayer_link.substring(0,autoplayer_link.length-1);
-              }
-              runningIndex = 1;
-              console.log("Autoplay link: " + autoplayer_link)
-            }else{  //Has next
-              var x = document.getElementById("myTableData").rows[runningIndex+1].cells
-              console.log("Going to next video on list")
-              autoplayer_link = myTableData.rows[runningIndex+1].cells[2].innerHTML;
-              if(x[3].innerHTML == 1){
-                autoplayer_link = autoplayer_link.substring(0,autoplayer_link.length-1);
-              }
-              runningIndex = runningIndex + 1;
-            }
-          }else{
-            //Static link
-            alert("Nothing here")
-            console.log("Nothing in list ;(")
-            return;
-          }
-
-          autoplayer_link = autoplayer_link + "?autoplay=1";
-          console.log("autoplayer post concat: " + autoplayer_link)
-          player.loadVideoByUrl(autoplayer_link);
-        });
-
-        socket.on('update running_index',function(newIndex){
-          runningIndex = newIndex;
-          console.log("Update running index detected - new index = " + runningIndex)
-        });
       }); //end of $function
+      //ADD CLIENT SOCKETS HERE
+      socket.on('video link', (video) => {
+        console.log(video[1]); //Just pass the object to view it
+        var link = "https://www.youtube.com/embed/" + video[2];
+        var table = document.getElementById("myTableData");   //Append to table
+
+        if(link.length > 60){
+          alert("Foh nga");
+          return; //use this in real code -- leave along for testing purposes
+        }
+
+        var song =  video[1];
+        var integrity = 0;
+        //Buttons
+        var playAll = '<input type="button" value = "Play" onClick="Javacsript:playRow(this)">';  //Change to button
+        var deleteButton = '<input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)">';
+
+        //Insert data into row into table
+        var rowCount = table.rows.length;
+        var row = table.insertRow(rowCount);
+        let tableHeader2 = [video[0], song, link,integrity, playAll, deleteButton]
+
+        console.log("Total rows: " + rowCount);
+        for(var i = 0; i < tableHeader2.length; i++){
+            row.insertCell(i).innerHTML = tableHeader2[i];
+        }
+        rowNum = myTableData.rows[table.rows.length-1].cells[0].innerHTML;
+        rowNum++;
+        console.log("Adding New row num: " + rowNum)
+        if(isNaN(rowNum)){
+          rowNum = 1;
+          console.log("Adjusting adding row num: " + rowNum)
+        }
+        document.getElementById("v").value = "";  //Reset textfield value
+        document.getElementById("v").focus();
+      });
+
+      socket.on('delete row', function(row){
+        // var index = row.parentNode.parentNode.rowIndex;   //Pass index for deletion
+        var table = document.getElementById("myTableData");
+        table.deleteRow(row);
+        rowNum = myTableData.rows[table.rows.length-1].cells[0].innerHTML;
+        rowNum++;
+        console.log("Deleting row: " + row);
+        console.log("New row num: " + rowNum)
+        if(isNaN(rowNum)){
+          rowNum = 1;
+          console.log("Adjusting row num: " + rowNum)
+        }
+        console.log("Deleting row: " + row);
+      });
+
+      socket.on('play row', function(row){
+        console.log("Play row detected")
+        console.log("Playing row: " + row);
+        runningIndex = row;
+        var x = document.getElementById("myTableData").rows[row].cells;
+        var newLink = x[2].innerHTML;     //Invisible space added at end for some reason
+        console.log("start"+newLink+"end")
+        console.log("Length: " + newLink.length)
+        if(newLink != ""){
+          //Bad fix -- links from db have extra char but newly added songs dont
+          if(x[3].innerHTML == 0){
+              var inputVideo = newLink + "?autoplay=1";
+              console.log("0 detected")
+          }else{
+            var inputVideo = newLink.substring(0,newLink.length-1) + "?autoplay=1";
+          }
+          player.loadVideoByUrl(inputVideo);  //Video baseds on url || can do id
+          console.log("InputVid: " + inputVideo);
+          console.log("Successfully inputted!");
+        }else{
+          console.log("Link is empty");
+        }
+      });
+
+      socket.on('hide video', function(){
+        var z = document.getElementById("player");
+        if (z.style.display === "none") {
+          z.style.display = "block";
+          document.getElementById("vidDisplay").value = "Hide >///<";
+        } else {
+          z.style.display = "none";
+          document.getElementById("vidDisplay").value = "Show oWo";
+        }
+      });
+
+      socket.on('count users', function(numUsers){
+        console.log('User connected' + numUsers);
+        totalUsers = numUsers;
+        document.getElementById("userCnt").innerHTML = "Connected Users: " + numUsers;
+      });
+
+      socket.on('output title', function(newTitle){
+        console.log("Client side title: " + newTitle);
+      });
+
+      socket.on('client play', function(){
+        player.playVideo();
+      });
+
+      socket.on('client pause', function(){
+        player.pauseVideo();
+      });
+
+      socket.on('client autoplay', function(){
+        console.log("client autoplay detected");
+        console.log("Should play row: " + autoRowNum) //Add 1 to this
+        //Check if next row exists
+        var table_row_len = table.rows.length;
+        var autoplayer_link;
+        console.log('Table len = ' + table_row_len);
+
+        //For circular
+        if(table_row_len > 1){
+          if(runningIndex +1 >= table_row_len){ //End of list
+            var x = document.getElementById("myTableData").rows[1].cells
+            console.log("End of list -- go back to beginning");
+            autoplayer_link = myTableData.rows[1].cells[2].innerHTML;
+            if(x[3].innerHTML == 1){
+              autoplayer_link = autoplayer_link.substring(0,autoplayer_link.length-1);
+            }
+            runningIndex = 1;
+            console.log("Autoplay link: " + autoplayer_link)
+          }else{  //Has next
+            var x = document.getElementById("myTableData").rows[runningIndex+1].cells
+            console.log("Going to next video on list")
+            autoplayer_link = myTableData.rows[runningIndex+1].cells[2].innerHTML;
+            if(x[3].innerHTML == 1){
+              autoplayer_link = autoplayer_link.substring(0,autoplayer_link.length-1);
+            }
+            runningIndex = runningIndex + 1;
+          }
+        }else{
+          //Static link
+          alert("Nothing here")
+          console.log("Nothing in list ;(")
+          return;
+        }
+
+        autoplayer_link = autoplayer_link + "?autoplay=1";
+        console.log("autoplayer post concat: " + autoplayer_link)
+        player.loadVideoByUrl(autoplayer_link);
+      });
+
+      socket.on('update running_index',function(newIndex){
+        runningIndex = newIndex;
+        console.log("Update running index detected - new index = " + runningIndex)
+      });
+
+      socket.on('test outside func',function(){
+        console.log("Test outside func works!");
+      });
+
+
 
       //Try to modularize the files by adding main.js but currently page refreshes upon finding main.js
       function deleteRow(obj) {
@@ -352,13 +362,71 @@
         // var x = "0VvMKJ4IuWM"
         // player.loadVideoById(x);
         // socket.emit('server autoplay');
-        var table_row_len = table.rows.length;
-        console.log('Table len = ' + table_row_len)
+        var updatingVid = player.getVideoEmbedCode();
+        console.log("nani")
+        console.log("Video detail: " + updatingVid);
+        //Now get the time and id || link
+        var time = player.getCurrentTime()
+        var newUrl = player.getVideoUrl()
+        var newVidId = player.getVideoData()['video_id'];
+        console.log("ID: " + id)
+        console.log("Time: " + time)
+        console.log("New url:" + newUrl +"end");
+        //Code for playing it
+        // var sup = 'P9njO8cyo-M';
+        // var time = 70.332
+        // player.loadVideoById({'videoId': sup,
+        //                'startSeconds': time,
+        //                });
+        // player.seekTo(70.3332, true);
+        // socket.emit('new testing');
+        // var table_row_len = table.rows.length;
+        // console.log('Table len = ' + table_row_len)
         // console.log("Current time: " + player.getCurrentTime())
         // console.log("Time: " + player.getDuration())
         // console.log("Test is working")
         // console.log("Auto row num: " + autoRowNum);
       }
+      //Stuff for existing user
+      socket.on('find playing vid',function(){
+        if(!newUser){
+          //Find what vid and time here
+          var time = player.getCurrentTime()
+          var newVidId = player.getVideoData()['video_id'];
+          var updateDetails = [newVidId, time]
+          socket.emit('update to playing vid',updateDetails);
+          console.log("Updating to palying vid emitted")
+        }else if(newUser && totalUsers <= 1){
+          newUser = false;  //Only user on site
+          console.log("User has been set to false")
+        }else{
+          console.log("Missed both tests")
+          //Waiting to turn false
+        }
+      });
+      //Stuff for new user
+      socket.on('update client playing vid', function(newVideo){
+        console.log("Update to playing vid recieved -client")
+        if(newUser){
+          //player.loadVideoById(newVideo[0]);
+          var x = "0VvMKJ4IuWM"
+          // player.loadVideoById(x)
+          // player.seekTo(newVideo[1]);
+
+          setTimeout(function(){
+            // player.loadVideoById(newVideo[0])
+            // player.seekTo(newVideo[1]);
+            player.loadVideoById({'videoId': newVideo[0],
+                 'startSeconds': newVideo[1]+1.5
+               });
+          }, 500);
+          newUser = false;
+        }else{
+          console.log("Nani")
+        }
+        console.log("new vid[0]" + newVideo[0])
+        console.log("new vid[1]" + newVideo[1])
+      });
 
       function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {

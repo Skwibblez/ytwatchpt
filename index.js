@@ -39,7 +39,20 @@ MongoClient.connect(connectionString, (err, client) => {
     numUsers = numUsers + 1;  //Count number of connected users
     io.emit('count users', numUsers);
     io.emit('update running_index', runningIndex);
-    console.log("Running index: " + runningIndex)
+
+    setTimeout(function(){
+      io.emit('find playing vid')
+    }, 1000);
+
+
+    socket.on('update to playing vid',(newVideo)=>{
+      console.log("Updating to palying vid emitted -- server")
+      console.log("new vid[0]" + newVideo[0])
+      console.log("new vid[1]" + newVideo[1])
+      //Send back to clients and check if newUser is true
+      io.emit('update client playing vid',newVideo)
+    });
+
     socket.on('disconnect', () =>{
       console.log('user disconnected');
       numUsers = numUsers -1;
