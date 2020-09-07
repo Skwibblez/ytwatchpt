@@ -13,6 +13,7 @@ app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(bodyParser.urlencoded({ extended: true }))
 
+
 const connectionString = process.env.MONGODB_URI || 'mongodb+srv://skwibblez:7utakoe@grisaia.jyhgf.mongodb.net/skwibblez?retryWrites=true&w=majority';
 // res.render('index.ejs', {songs: results})
 var server_auto_row;
@@ -113,7 +114,7 @@ MongoClient.connect(connectionString, (err, client) => {
       console.log("Server pause detected");
       io.emit('client pause');
     });
-    //Added runningIndex
+
     socket.on('server autoplay', (auto_link) =>{
       console.log("Server autoplay detected")
       io.emit('client autoplay',auto_link);
