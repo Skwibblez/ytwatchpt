@@ -122,6 +122,7 @@
       console.log("Row num: " + rowNum)
 
 
+
       $(function () {
         //Main search function
         $('form').submit(function(e){
@@ -287,42 +288,16 @@
         player.pauseVideo();
       });
 
-      socket.on('client autoplay', function(){
+      socket.on('client autoplay', function(auto_link){
         console.log("client autoplay detected");
         console.log("Should play row: " + autoRowNum) //Add 1 to this
         //Check if next row exists
-        var table_row_len = table.rows.length;
         var autoplayer_link;
+
+        var table_row_len = table.rows.length;
         console.log('Table len = ' + table_row_len);
-
-        //For circular
-        if(table_row_len > 1){
-          if(runningIndex +1 >= table_row_len){ //End of list
-            var x = document.getElementById("myTableData").rows[1].cells
-            console.log("End of list -- go back to beginning");
-            autoplayer_link = myTableData.rows[1].cells[2].innerHTML;
-            if(x[3].innerHTML == 1){
-              autoplayer_link = autoplayer_link.substring(0,autoplayer_link.length-1);
-            }
-            runningIndex = 1;
-            console.log("Autoplay link: " + autoplayer_link)
-          }else{  //Has next
-            var x = document.getElementById("myTableData").rows[runningIndex+1].cells
-            console.log("Going to next video on list")
-            autoplayer_link = myTableData.rows[runningIndex+1].cells[2].innerHTML;
-            if(x[3].innerHTML == 1){
-              autoplayer_link = autoplayer_link.substring(0,autoplayer_link.length-1);
-            }
-            runningIndex = runningIndex + 1;
-          }
-        }else{
-          //Static link
-          alert("Nothing here")
-          console.log("Nothing in list ;(")
-          return;
-        }
-
-        autoplayer_link = autoplayer_link + "?autoplay=1";
+        var autoplayer_link = auto_link + "?autoplay=1";
+        // autoplayer_link = autoplayer_link + "?autoplay=1";
         console.log("autoplayer post concat: " + autoplayer_link)
         player.loadVideoByUrl(autoplayer_link);
       });
@@ -365,12 +340,11 @@
       }
       //YT iframe api
       function onPlayerStateChange(event) {
-        // if(done){console.log("Done is true")}
-        // else{console.log("Done is false")}
-        //console.log("entered state change: " + player.getPlayerState())
         if(player.getPlayerState() == 0){
           if(autoplay){
-            socket.emit('server autoplay')
+            //For circular autoplay
+            var autoplayer_link = calculateRow();
+            socket.emit('server autoplay', autoplayer_link)
             console.log("Video done -- booting autoplay");
           }else{
             console.log("Video done -- autoplay undetected");
@@ -409,9 +383,10 @@
         // var x = "0VvMKJ4IuWM"
         // player.loadVideoById(x);
         // socket.emit('server autoplay');
-        progressBarLoop();
-        console.log("Calling progress bar loop")
-
+        //progressBarLoop();
+        console.log("Calling calculate")
+        var n = calculateRow();
+        console.log("N: " + n);
       }
       //Stuff for existing user
       socket.on('find playing vid',function(){
@@ -476,6 +451,37 @@
 
       function autoplay(){
         socket.emit('server autoplay');
+      }
+
+      function calculateRow(){
+        var table_row_len = table.rows.length;
+        var autoplayer_link;
+        if(table_row_len > 1){
+          if(runningIndex +1 >= table_row_len){ //End of list
+            var x = document.getElementById("myTableData").rows[1].cells
+            console.log("End of list -- go back to beginning");
+            autoplayer_link = myTableData.rows[1].cells[2].innerHTML;
+            if(x[3].innerHTML == 1){
+              autoplayer_link = autoplayer_link.substring(0,autoplayer_link.length-1);
+            }
+            runningIndex = 1; //Set to first index
+            console.log("Autoplay link: " + autoplayer_link)
+          }else{  //Has next
+            var x = document.getElementById("myTableData").rows[runningIndex+1].cells
+            console.log("Going to next video on list")
+            autoplayer_link = myTableData.rows[runningIndex+1].cells[2].innerHTML;
+            if(x[3].innerHTML == 1){
+              autoplayer_link = autoplayer_link.substring(0,autoplayer_link.length-1);
+            }
+            runningIndex = runningIndex + 1;
+          }
+        }else{
+          //Static link
+          alert("Nothing here")
+          console.log("Nothing in list ;(")
+          return;
+        }
+        return autoplayer_link;
       }
 
       function printRow(){

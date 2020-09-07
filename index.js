@@ -113,10 +113,10 @@ MongoClient.connect(connectionString, (err, client) => {
       console.log("Server pause detected");
       io.emit('client pause');
     });
-
-    socket.on('server autoplay', () =>{
+    //Added runningIndex
+    socket.on('server autoplay', (auto_link) =>{
       console.log("Server autoplay detected")
-      io.emit('client autoplay');
+      io.emit('client autoplay',auto_link);
     });
     //var signalOn = 0;
     socket.on('progress bar seek',(seekTime)=>{
