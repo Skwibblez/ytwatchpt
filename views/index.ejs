@@ -121,8 +121,6 @@
       console.log("Table data: " + myTableData.rows[table.rows.length-1].cells[0].innerHTML)
       console.log("Row num: " + rowNum)
 
-
-
       $(function () {
         //Main search function
         $('form').submit(function(e){
@@ -292,37 +290,8 @@
         console.log("client autoplay detected");
         console.log("Should play row: " + autoRowNum) //Add 1 to this
         //Check if next row exists
-        var autoplayer_link;
-
         var table_row_len = table.rows.length;
         console.log('Table len = ' + table_row_len);
-
-        // //For circular
-        // if(table_row_len > 1){
-        //   if(runningIndex +1 >= table_row_len){ //End of list
-        //     var x = document.getElementById("myTableData").rows[1].cells
-        //     console.log("End of list -- go back to beginning");
-        //     autoplayer_link = myTableData.rows[1].cells[2].innerHTML;
-        //     if(x[3].innerHTML == 1){
-        //       autoplayer_link = autoplayer_link.substring(0,autoplayer_link.length-1);
-        //     }
-        //     runningIndex = 1; //Set to first index
-        //     console.log("Autoplay link: " + autoplayer_link)
-        //   }else{  //Has next
-        //     var x = document.getElementById("myTableData").rows[runningIndex+1].cells
-        //     console.log("Going to next video on list")
-        //     autoplayer_link = myTableData.rows[runningIndex+1].cells[2].innerHTML;
-        //     if(x[3].innerHTML == 1){
-        //       autoplayer_link = autoplayer_link.substring(0,autoplayer_link.length-1);
-        //     }
-        //     runningIndex = runningIndex + 1;
-        //   }
-        // }else{
-        //   //Static link
-        //   alert("Nothing here")
-        //   console.log("Nothing in list ;(")
-        //   return;
-        // }
         var autoplayer_link = auto_link + "?autoplay=1";
         // autoplayer_link = autoplayer_link + "?autoplay=1";
         console.log("autoplayer post concat: " + autoplayer_link)
@@ -524,9 +493,10 @@
       //Will rename later
 
       //Make syncing function better rather than +1.5 -- done? not horrible actually
-      //Turn table into scrollable --todo
+      //Turn table into scrollable --done
       //Enhance progress bar for draggability --todo
       //REFER  to other ytproject for mongodb connection (problem was ip listing...fokme)
+      //Make hovering over the table give a darker background to view names
       //90% progress now??
     </script>
   <script src="https://apis.google.com/js/client.js?onload=init"></script>
