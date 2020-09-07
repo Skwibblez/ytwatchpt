@@ -51,7 +51,7 @@ table thead tr th {
   text-align: left;
   position: sticky;
   top: 0px;
-  background-color: white;
+  background-color: #eeeeee;
   /* color: #fff; */
 }
 #myTableData{
