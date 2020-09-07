@@ -11,14 +11,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.static('public'));
 
 app.use(express.static(path.join(__dirname, 'public')))
-
-// app.use('/images', express.static(__dirname + '/public'));
-// app.use(express.static(path.join(__dirname, 'public/images')))
-// app.use(express.static('public/images'));
-
 app.use(bodyParser.urlencoded({ extended: true }))
-
-// console.log("Dir name: " + __dirname);
 
 const connectionString = process.env.MONGODB_URI || 'mongodb+srv://skwibblez:7utakoe@grisaia.jyhgf.mongodb.net/skwibblez?retryWrites=true&w=majority';
 // res.render('index.ejs', {songs: results})
