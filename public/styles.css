@@ -82,8 +82,11 @@ table thead tr th {
   font-size: 15px;
 }
 
-#myTableData:hover{
+/* #myTableData:hover{
   background: #eeeeef !important;
+} */
+#myTableData:hover{
+  background: #eeeeef;
 }
 
 /* #song_col:hover{
