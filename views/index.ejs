@@ -89,12 +89,9 @@
         var difOffset = (e.pageX - this.offsetLeft)/600 * 100;
         console.log("Offset: " +difOffset);
         //Translate offset into time and call seek
-        //Convert offSet into time
-        var seekTime = difOffset * player.getDuration() / 100;
+        var seekTime = difOffset * player.getDuration() / 100;  //Convert offSet into time
         console.log("Fraction: " + seekTime);
-        //var fraction = difOffset * player.getCurrentTime()/player.getDuration()*100;
         progressSquare.css("left",difOffset.toString() + "%");  //Moves square to correct position
-        //Need to emit
         socket.emit('progress bar seek', seekTime);
         //player.seekTo(seekTime,true);
       });
@@ -121,13 +118,13 @@
       console.log("Table data: " + myTableData.rows[table.rows.length-1].cells[0].innerHTML)
       console.log("Row num: " + rowNum)
 
+
       $(function () {
         //Main search function
         $('form').submit(function(e){
           e.preventDefault(); // prevents page reloading
           if($('#v').val() !== ''){   //If valid input
-            //socket.emit('video link', $('#v').val());   //Sends object to server
-            //String parser here -- should use YT API later
+            //String parser here
             var n = $('#v').val().indexOf("=");
             var length = $('#v').val().length;
             if(n !== -1){   //Checking for specific ID
@@ -243,10 +240,10 @@
         console.log("Length: " + newLink.length)
         if(newLink != ""){
           //Bad fix -- links from db have extra char but newly added songs dont
-          if(x[3].innerHTML == 0){
+          if(x[3].innerHTML == 0){  //0 represents newly added
               var inputVideo = newLink + "?autoplay=1";
               console.log("0 detected")
-          }else{
+          }else{  //1 represents data retrieved from db
             var inputVideo = newLink.substring(0,newLink.length-1) + "?autoplay=1";
           }
           player.loadVideoByUrl(inputVideo);  //Video baseds on url || can do id
@@ -315,7 +312,6 @@
           var deletion_arr = [index, index_row_num]
           console.log("Delete target row num: " + myTableData.rows[index].cells[0].innerHTML)
           socket.emit('delete row', deletion_arr);
-          //socket.emit('delete row', $('#v').val()); //I am able to do this <---
       }
 
       function playRow(obj){
@@ -336,8 +332,6 @@
       }
       //YT iframe api
       function onPlayerStateChange(event) {
-        // if(done){console.log("Done is true")}
-        // else{console.log("Done is false")}
         //console.log("entered state change: " + player.getPlayerState())
         //Added this whole thing
         var table_row_len = table.rows.length;
@@ -382,10 +376,6 @@
               return;
             }
             var fraction = player.getCurrentTime()/player.getDuration()*100;
-            // console.log("Play current time: " + player.getCurrentTime());
-            // console.log("Total: " + player.getDuration());
-            // console.log("Fraction: " + fraction);
-            // console.log("Fraction: " + fraction);
             progressSquare.css("left",fraction.toString() + "%");
           },200);
 
