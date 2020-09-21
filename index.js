@@ -128,6 +128,10 @@ MongoClient.connect(connectionString, (err, client) => {
       console.log("Stop multi detected")
       // io.emit('client autoplay');
     });
+
+    socket.on('server repeat',()=>{
+      io.emit('client repeat');
+    })
   }); //io connection
 })//mongodb client
 
