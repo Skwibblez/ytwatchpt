@@ -25,6 +25,9 @@
             <br><button type="button" onclick="autoplay()">Randomize tbi >///< </button> -->
             <br><input id = "vidDisplay" type = "button" value="Hide >///<" onclick="videoDisplay()"/>
             <input id = "repeat_btn" type = "button" value="Repeat Off" onclick="rept()"/>
+            <br> <!-- Button for shuffling -->
+            <input id = "shuffle_btn" type = "button" value="Shuffle Off" onclick="Shuffle()"/>
+            <input id = "next_btn" type = "button" value="Next" onclick="Next()"/>
           </div>
           <form action="">
             <tr>
@@ -75,11 +78,12 @@
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
       var player;
       var autoplay = true;
-      var runningIndex = 1;
+      var runningIndex = 1; //Used for autoplay
       //For updating new users
       var newUser = true;
       var totalUsers = 1;
-      var repeat = false;
+      var repeat = false; //Default repeat to false
+      var shuffle_status = false; //Defeat shuffle to false
       ////////END ///////////////
       /////Adding timeline///////
       var bar = document.getElementById('progressBar');
@@ -106,7 +110,7 @@
       var table = document.getElementById("myTableData");
       var rowNum = myTableData.rows[table.rows.length-1].cells[0].innerHTML; //Get row_num of last column
       rowNum++;
-      var autoRowNum = 1;
+      var autoRowNum = 1; //Not used ...
       console.log(rowNum);
 
       if(rowNum == "&nbsp;"){
@@ -193,8 +197,8 @@
         var song =  video[1];
         var integrity = 0;
         //Buttons
-        var playAll = '<input type="button" value = "Play" onClick="Javacsript:playRow(this)">';  //Change to button
-        var deleteButton = '<input type="button" value = "Delete" onClick="Javacsript:deleteRow(this)">';
+        var playAll = '<input type="button" value = "Play" onClick="Javascript:playRow(this)">';  //Change to button
+        var deleteButton = '<input type="button" value = "Delete" onClick="Javascript:deleteRow(this)">';
 
         //Insert data into row into table
         var rowCount = table.rows.length;
@@ -335,14 +339,29 @@
       function onPlayerStateChange(event) {
         //console.log("entered state change: " + player.getPlayerState())
         //Added this whole thing
+        //State: -1 = unstarted, 0 = ended, 1 = playing, 2 = paused, 3 = buffering, 5 = video cued
         var table_row_len = table.rows.length;
+
         if(player.getPlayerState() == 0){
           if(repeat == true){
             player.seekTo(0,true);
+          }else if(shuffle_status){
+            var rng_index = Math.floor(Math.random() * (table_row_len-1) ) + 1;
+            runningIndex = rng_index; //Update running index; CANT DO +1 IF IT IS LAST ONE IN TABLE
+
+            var autoplayer_link = myTableData.rows[rng_index].cells[2].innerHTML;
+            var integrity_check = document.getElementById("myTableData").rows[rng_index].cells;
+            if(integrity_check[3].innerHTML == 1){
+              autoplayer_link = autoplayer_link.substring(0,autoplayer_link.length-1);
+            }
+            console.log("Rng index: " + rng_index);
+            console.log("Autoplay link: " + autoplayer_link)
+            socket.emit('server autoplay', autoplayer_link);  //Sends correct link to server
+            console.log("Video done -- booting shuffled autoplay");
           }else if(autoplay){
-            //For circular
+            //For circular autoplay
             var autoplayer_link;
-            if(table_row_len > 1){
+            if(table_row_len > 1){  //What if there is exactly 1 video in list?
               if(runningIndex +1 >= table_row_len){ //End of list
                 var x = document.getElementById("myTableData").rows[1].cells
                 console.log("End of list -- go back to beginning");
@@ -367,7 +386,7 @@
               console.log("Nothing in list ;(")
               return;
             }
-            socket.emit('server autoplay', autoplayer_link)
+            socket.emit('server autoplay', autoplayer_link);  //Sends correct link to server
             console.log("Video done -- booting autoplay");
           }else{
             console.log("Video done -- autoplay undetected");
@@ -409,10 +428,10 @@
       //Stuff for existing user
       socket.on('find playing vid',function(){
         if(!newUser){
-          //Find what vid and time here
+          //Find what vid and time here ALSO pass in shuffle and repeat status
           var time = player.getCurrentTime()
           var newVidId = player.getVideoData()['video_id'];
-          var updateDetails = [newVidId, time]
+          var updateDetails = [newVidId, time, repeat, shuffle_status]
           socket.emit('update to playing vid',updateDetails);
           console.log("Updating to palying vid emitted -- existing user")
         }else if(newUser && totalUsers <= 1){
@@ -440,12 +459,24 @@
                  'startSeconds': newVideo[1]+1.5
                });
           }, 500);
+          //Update status here
+          repeat = newVideo[2];
+          shuffle_status = newVideo[3];
+          if(repeat){
+            document.getElementById('repeat_btn').value = "Repeat On";
+          }
+          if(shuffle_status){
+            console.log("Shuffle changed value");
+            document.getElementById('shuffle_btn').value = "Shuffle On";
+          }
           newUser = false;
         }else{
           console.log("Nani")
         }
         console.log("new vid[0]" + newVideo[0])
         console.log("new vid[1]" + newVideo[1])
+        console.log("new vid[2]" + newVideo[2])
+        console.log("new vid[3]" + newVideo[3])
       });
 
       function onYouTubeIframeAPIReady() {
@@ -484,6 +515,12 @@
         if(zzz.value === "Repeat Off"){
           console.log("Repeat on")
           repeat = true;
+          if(shuffle_status){
+            shuffle_status = false;
+            document.getElementById('shuffle_btn').value = "Shuffle Off";
+            console.log("Shuffle is true, turning off repeat ---")
+
+          }
           document.getElementById("repeat_btn").value = "Repeat On";
         } else {
           console.log("Repeat off")
@@ -508,6 +545,39 @@
            }
         }
       });
+
+      function Shuffle(){
+        //Toggle shuffle for all users -- update the autoplayer as well as the next() function
+        socket.emit('server shuffle')
+      }
+
+      socket.on('client shuffle', function(){
+        if(!shuffle_status){
+          shuffle_status = true;
+          //Check status on repeat
+          if(repeat){
+            repeat = false;
+            document.getElementById('repeat_btn').value = "Repeat Off";
+            console.log("Repeat is true, turning off repeat ---")
+          }
+          document.getElementById("shuffle_btn").value = "Shuffle On"
+          console.log("Shuffle ON");
+        }else{
+          shuffle_status = false;
+          document.getElementById("shuffle_btn").value = "Shuffle Off"
+          console.log("Shuffle OFF");
+        }
+
+      });
+      function Next(){
+        //console.log("Length: " + player.getDuration());
+        socket.emit('server next');
+
+      }
+      //Plays next video
+      socket.on('client next', function(){
+        player.seekTo(player.getDuration(),true); //Pepega but works -- change later maybe
+      })
 
       //TO DOOOOOOO
       //Need to add enhanced search function -- may need to use YTAPI -- done

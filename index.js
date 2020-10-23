@@ -46,12 +46,12 @@ MongoClient.connect(connectionString, (err, client) => {
     }, 1000);
     // io.emit('find playing vid')
 
-    socket.on('update to playing vid',(newVideo)=>{
+    socket.on('update to playing vid',(update_details)=>{
       console.log("Updating to palying vid emitted -- server")
-      console.log("new vid[0]" + newVideo[0])
-      console.log("new vid[1]" + newVideo[1])
+      console.log("new vid[0]" + update_details[0])
+      console.log("new vid[1]" + update_details[1])
       //Send back to clients and check if newUser is true
-      io.emit('update client playing vid',newVideo)
+      io.emit('update client playing vid', update_details)
     });
 
     socket.on('disconnect', () =>{
@@ -131,7 +131,14 @@ MongoClient.connect(connectionString, (err, client) => {
 
     socket.on('server repeat',()=>{
       io.emit('client repeat');
-    })
+    });
+
+    socket.on('server shuffle',()=>{
+      io.emit('client shuffle');
+    });
+    socket.on('server next',()=>{
+      io.emit('client next');
+    });
   }); //io connection
 })//mongodb client
 
